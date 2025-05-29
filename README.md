@@ -1,1 +1,7 @@
-# Dashboard Personal Finances
+# Finance Dashboard
+
+👉 [🇫🇷 Lire en français](./README.fr.md)
+
+## Description
+
+...
