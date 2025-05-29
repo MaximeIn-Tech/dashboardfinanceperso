@@ -311,9 +311,20 @@ with tab1:
             f"📅 **Versements {frequence_versement.lower()}s** en **{moment_versement.lower()}**"
         )
 
+    frequences_affichage = {
+        "Mensuel": "par mois",
+        "Trimestriel": "par trimestre",
+        "Semestriel": "par semestre",
+        "Annuel": "par an",
+    }
+    # Formattage dynamique
+    affichage_frequence = frequences_affichage.get(
+        frequence_versement, frequence_versement.lower()
+    )
+
     # Résultats
     st.info(
-        f"📝 Pour un investissement de {versement_periodique} € sur {duree_annees} ans avec un rendement de {taux_annuel} % par an."
+        f"📝 Pour un investissement de {versement_periodique} € par {affichage_frequence} sur {duree_annees} ans avec un rendement de {taux_annuel} % par an."
     )
     col1, col2, col3, col4 = st.columns(4)
     with col1:
