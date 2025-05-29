@@ -180,68 +180,69 @@ with tab1:
         else:
             taux_imposition = 0.0
 
-    st.subheader("🧮 Optimisation fiscale avancée")
+        # TODO : A reprendre en main, je veux que ce soit calculé aussi dans les impôts !
+        # st.subheader("🧮 Optimisation fiscale avancée")
 
-    # Checkbox principale
-    optimisation_fiscale = st.checkbox(
-        "Calcul avec TMI personnelle",
-        value=False,
-        key="ic_optimisation_fiscale",
-        help="Utilise votre TMI réelle pour calculer l'impôt sur les plus-values",
-    )
-    # Affichage conditionnel des paramètres avancés
-    if optimisation_fiscale:
-        col1, col2, col3 = st.columns([1.2, 1, 1])
+        # # Checkbox principale
+        # optimisation_fiscale = st.checkbox(
+        #     "Calcul avec TMI personnelle",
+        #     value=False,
+        #     key="ic_optimisation_fiscale",
+        #     help="Utilise votre TMI réelle pour calculer l'impôt sur les plus-values",
+        # )
+        # # Affichage conditionnel des paramètres avancés
+        # if optimisation_fiscale:
+        #     col1, col2, col3 = st.columns([1.2, 1, 1])
 
-        # Revenus annuels
-        with col1:
-            revenus_annuels_tmi = st.number_input(
-                "Vos revenus annuels (€)",
-                min_value=0.0,
-                value=45000.0,
-                step=1000.0,
-                key="ic_revenus_tmi",
-            )
+        #     # Revenus annuels
+        #     with col1:
+        #         revenus_annuels_tmi = st.number_input(
+        #             "Vos revenus annuels (€)",
+        #             min_value=0.0,
+        #             value=45000.0,
+        #             step=1000.0,
+        #             key="ic_revenus_tmi",
+        #         )
 
-        # Situation familiale
-        with col2:
-            situation_familiale_ic = st.selectbox(
-                "Situation familiale",
-                [
-                    "Célibataire",
-                    "Marié(e)/Pacsé(e)",
-                    "Couple + 1 enfant",
-                    "Couple + 2 enfants",
-                    "Couple + 3 enfants",
-                ],
-                key="ic_situation",
-            )
+        #     # Situation familiale
+        #     with col2:
+        #         situation_familiale_ic = st.selectbox(
+        #             "Situation familiale",
+        #             [
+        #                 "Célibataire",
+        #                 "Marié(e)/Pacsé(e)",
+        #                 "Couple + 1 enfant",
+        #                 "Couple + 2 enfants",
+        #                 "Couple + 3 enfants",
+        #             ],
+        #             key="ic_situation",
+        #         )
 
-            parts_fiscales_ic = {
-                "Célibataire": 1,
-                "Marié(e)/Pacsé(e)": 2,
-                "Couple + 1 enfant": 2.5,
-                "Couple + 2 enfants": 3,
-                "Couple + 3 enfants": 4,
-            }
+        #         parts_fiscales_ic = {
+        #             "Célibataire": 1,
+        #             "Marié(e)/Pacsé(e)": 2,
+        #             "Couple + 1 enfant": 2.5,
+        #             "Couple + 2 enfants": 3,
+        #             "Couple + 3 enfants": 4,
+        #         }
 
-            nb_parts_ic = parts_fiscales_ic[situation_familiale_ic]
+        #         nb_parts_ic = parts_fiscales_ic[situation_familiale_ic]
 
-        # Calcul TMI + Stratégie
-        with col3:
-            tmi_personnelle = calculer_tmi_simplifiee(revenus_annuels_tmi, nb_parts_ic)
-            st.metric("Votre TMI", f"{tmi_personnelle}%")
+        #     # Calcul TMI + Stratégie
+        #     with col3:
+        #         tmi_personnelle = calculer_tmi_simplifiee(revenus_annuels_tmi, nb_parts_ic)
+        #         st.metric("Votre TMI", f"{tmi_personnelle}%")
 
-            optimisation_type = st.selectbox(
-                "Stratégie d'optimisation",
-                [
-                    "Plus-values mobilières",
-                    "Intérêts (livrets/obligations)",
-                    "Dividendes",
-                ],
-                key="ic_optimisation_type",
-                help="Type de revenus générés par votre placement",
-            )
+        #         optimisation_type = st.selectbox(
+        #             "Stratégie d'optimisation",
+        #             [
+        #                 "Plus-values mobilières",
+        #                 "Intérêts (livrets/obligations)",
+        #                 "Dividendes",
+        #             ],
+        #             key="ic_optimisation_type",
+        #             help="Type de revenus générés par votre placement",
+        #         )
 
         # Mapping des fréquences
         freq_versement_map = {
