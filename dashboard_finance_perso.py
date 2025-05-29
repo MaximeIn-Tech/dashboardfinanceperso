@@ -1,3 +1,5 @@
+import math
+
 import numpy as np
 import pandas as pd
 import plotly.express as px
@@ -443,7 +445,7 @@ with tab1:
         with col1:
             if calcul_apres_impot:
 
-                annees_abattement = interets_bruts / 4600
+                annees_abattement = math.ceil(interets_bruts / 4600)
                 st.info(
                     f"""
                 **Fiscalité {type_placement} :**
@@ -453,7 +455,7 @@ with tab1:
                 - Impôts : {impots_sur_interets:,.2f} €
                 - **Intérêts nets : {interets_nets:,.2f} €**
 
-                Pour optimiser votre imposition, vous devriez retirer 4600€/an sur {annees_abattement:.2f} ans.
+                Pour optimiser votre imposition, vous devriez retirer 4600€/an sur {annees_abattement} ans.
                 """
                 )
 
