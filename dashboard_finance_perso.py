@@ -100,6 +100,35 @@ with tab1:
     st.subheader("Options avancées")
     col1, col2, col3 = st.columns(3)
 
+    # Fonction helper pour calculer la TMI
+    def calculer_tmi_simplifiee(revenus_annuels, nb_parts=1, annee=2024):
+        """Calcul simplifié de la TMI"""
+        if annee == 2024:
+            tranches = [
+                (0, 10777, 0),
+                (10777, 27478, 11),
+                (27478, 78570, 30),
+                (78570, 168994, 41),
+                (168994, float("inf"), 45),
+            ]
+        else:  # 2023
+            tranches = [
+                (0, 10225, 0),
+                (10225, 26070, 11),
+                (26070, 74545, 30),
+                (74545, 160336, 41),
+                (160336, float("inf"), 45),
+            ]
+
+        quotient_familial = revenus_annuels / nb_parts
+        tmi = 0
+
+        for seuil_inf, seuil_sup, taux in tranches:
+            if quotient_familial > seuil_inf:
+                tmi = taux
+
+        return tmi
+
     with col1:
         ajuster_inflation = st.checkbox(
             "Ajuster à l'inflation", value=False, key="ic_inflation_check"
@@ -150,6 +179,69 @@ with tab1:
                     taux_imposition = 30
         else:
             taux_imposition = 0.0
+
+        # À ajouter après la section "Options avancées" (ligne ~83)
+    st.subheader("🧮 Optimisation fiscale avancée")
+    col1, col2, col3 = st.columns(3)
+
+    with col1:
+        optimisation_fiscale = st.checkbox(
+            "Calcul avec TMI personnelle",
+            value=False,
+            key="ic_optimisation_fiscale",
+            help="Utilise votre TMI réelle pour calculer l'impôt sur les plus-values",
+        )
+
+        if optimisation_fiscale:
+            revenus_annuels_tmi = st.number_input(
+                "Vos revenus annuels (€)",
+                min_value=0.0,
+                value=45000.0,
+                step=1000.0,
+                key="ic_revenus_tmi",
+            )
+
+    with col2:
+        if optimisation_fiscale:
+            situation_familiale_ic = st.selectbox(
+                "Situation familiale",
+                [
+                    "Célibataire",
+                    "Marié(e)/Pacsé(e)",
+                    "Couple + 1 enfant",
+                    "Couple + 2 enfants",
+                    "Couple + 3 enfants",
+                ],
+                key="ic_situation",
+            )
+
+            parts_fiscales_ic = {
+                "Célibataire": 1,
+                "Marié(e)/Pacsé(e)": 2,
+                "Couple + 1 enfant": 2.5,
+                "Couple + 2 enfants": 3,
+                "Couple + 3 enfants": 4,
+            }
+
+            nb_parts_ic = parts_fiscales_ic[situation_familiale_ic]
+
+    with col3:
+        if optimisation_fiscale:
+            # Calcul de la TMI
+            tmi_personnelle = calculer_tmi_simplifiee(revenus_annuels_tmi, nb_parts_ic)
+            st.metric("Votre TMI", f"{tmi_personnelle}%")
+
+            # Choix du type d'optimisation
+            optimisation_type = st.selectbox(
+                "Stratégie d'optimisation",
+                [
+                    "Plus-values mobilières",
+                    "Intérêts (livrets/obligations)",
+                    "Dividendes",
+                ],
+                key="ic_optimisation_type",
+                help="Type de revenus générés par votre placement",
+            )
 
     # Mapping des fréquences
     freq_versement_map = {"Mensuel": 12, "Trimestriel": 4, "Semestriel": 2, "Annuel": 1}
