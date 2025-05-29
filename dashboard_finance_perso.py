@@ -6,6 +6,36 @@ import plotly.express as px
 import plotly.graph_objects as go
 import streamlit as st
 
+
+def calculer_tmi_simplifiee(revenus_annuels, nb_parts=1, annee=2024):
+    """Calcul simplifié de la TMI"""
+    if annee == 2024:
+        tranches = [
+            (0, 10777, 0),
+            (10777, 27478, 11),
+            (27478, 78570, 30),
+            (78570, 168994, 41),
+            (168994, float("inf"), 45),
+        ]
+    else:  # 2023
+        tranches = [
+            (0, 10225, 0),
+            (10225, 26070, 11),
+            (26070, 74545, 30),
+            (74545, 160336, 41),
+            (160336, float("inf"), 45),
+        ]
+
+    quotient_familial = revenus_annuels / nb_parts
+    tmi = 0
+
+    for seuil_inf, seuil_sup, taux in tranches:
+        if quotient_familial > seuil_inf:
+            tmi = taux
+
+    return tmi
+
+
 # Configuration de la page
 st.set_page_config(page_title="Calculateurs Financiers", page_icon="💰", layout="wide")
 
@@ -77,34 +107,6 @@ with tab1:
         )
 
     with col2:
-        # Fonction helper pour calculer la TMI
-        def calculer_tmi_simplifiee(revenus_annuels, nb_parts=1, annee=2024):
-            """Calcul simplifié de la TMI"""
-            if annee == 2024:
-                tranches = [
-                    (0, 10777, 0),
-                    (10777, 27478, 11),
-                    (27478, 78570, 30),
-                    (78570, 168994, 41),
-                    (168994, float("inf"), 45),
-                ]
-            else:  # 2023
-                tranches = [
-                    (0, 10225, 0),
-                    (10225, 26070, 11),
-                    (26070, 74545, 30),
-                    (74545, 160336, 41),
-                    (160336, float("inf"), 45),
-                ]
-
-            quotient_familial = revenus_annuels / nb_parts
-            tmi = 0
-
-            for seuil_inf, seuil_sup, taux in tranches:
-                if quotient_familial > seuil_inf:
-                    tmi = taux
-
-            return tmi
 
         st.subheader("⚙️ Paramètres de capitalisation")
 
