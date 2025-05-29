@@ -180,19 +180,21 @@ with tab1:
         else:
             taux_imposition = 0.0
 
-        # À ajouter après la section "Options avancées" (ligne ~83)
     st.subheader("🧮 Optimisation fiscale avancée")
-    col1, col2, col3 = st.columns(3)
 
-    with col1:
-        optimisation_fiscale = st.checkbox(
-            "Calcul avec TMI personnelle",
-            value=False,
-            key="ic_optimisation_fiscale",
-            help="Utilise votre TMI réelle pour calculer l'impôt sur les plus-values",
-        )
+    # Checkbox principale
+    optimisation_fiscale = st.checkbox(
+        "Calcul avec TMI personnelle",
+        value=False,
+        key="ic_optimisation_fiscale",
+        help="Utilise votre TMI réelle pour calculer l'impôt sur les plus-values",
+    )
+    # Affichage conditionnel des paramètres avancés
+    if optimisation_fiscale:
+        col1, col2, col3 = st.columns([1.2, 1, 1])
 
-        if optimisation_fiscale:
+        # Revenus annuels
+        with col1:
             revenus_annuels_tmi = st.number_input(
                 "Vos revenus annuels (€)",
                 min_value=0.0,
@@ -201,9 +203,8 @@ with tab1:
                 key="ic_revenus_tmi",
             )
 
-    with col2:
-        if optimisation_fiscale:
-            st.write("")
+        # Situation familiale
+        with col2:
             situation_familiale_ic = st.selectbox(
                 "Situation familiale",
                 [
@@ -226,13 +227,11 @@ with tab1:
 
             nb_parts_ic = parts_fiscales_ic[situation_familiale_ic]
 
-    with col3:
-        if optimisation_fiscale:
-            # Calcul de la TMI
+        # Calcul TMI + Stratégie
+        with col3:
             tmi_personnelle = calculer_tmi_simplifiee(revenus_annuels_tmi, nb_parts_ic)
             st.metric("Votre TMI", f"{tmi_personnelle}%")
 
-            # Choix du type d'optimisation
             optimisation_type = st.selectbox(
                 "Stratégie d'optimisation",
                 [
@@ -244,15 +243,20 @@ with tab1:
                 help="Type de revenus générés par votre placement",
             )
 
-    # Mapping des fréquences
-    freq_versement_map = {"Mensuel": 12, "Trimestriel": 4, "Semestriel": 2, "Annuel": 1}
-    freq_capitalisation_map = {
-        "Mensuelle": 12,
-        "Trimestrielle": 4,
-        "Semestrielle": 2,
-        "Annuelle": 1,
-        "Continue": float("inf"),
-    }
+        # Mapping des fréquences
+        freq_versement_map = {
+            "Mensuel": 12,
+            "Trimestriel": 4,
+            "Semestriel": 2,
+            "Annuel": 1,
+        }
+        freq_capitalisation_map = {
+            "Mensuelle": 12,
+            "Trimestrielle": 4,
+            "Semestrielle": 2,
+            "Annuelle": 1,
+            "Continue": float("inf"),
+        }
 
     m = freq_versement_map[frequence_versement]  # Fréquence des versements
     n = freq_capitalisation_map[frequence_capitalisation]  # Fréquence de capitalisation
