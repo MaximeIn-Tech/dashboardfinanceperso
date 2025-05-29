@@ -849,3 +849,6 @@ st.markdown("---")
 st.markdown(
     "💡 **Conseil** : Ces calculateurs sont à titre indicatif. Les rendements passés ne garantissent pas les performances futures."
 )
+st.markdown(
+    "❤️ Ce site a été créé avec amour par [Maxime Hamou](https://www.linkedin.com/in/maximehamou/) !"
+)
