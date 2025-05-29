@@ -10,6 +10,14 @@ st.set_page_config(page_title="Calculateurs Financiers", page_icon="💰", layou
 # Titre principal
 st.title("💰 Calculateurs Financiers")
 st.markdown("Une suite d'outils pour planifier vos finances personnelles")
+
+st.markdown(
+    """
+    <meta name="description" content="Une application Streamlit pour suivre facilement ses finances personnelles : revenus, dépenses, investissements.">
+    """,
+    unsafe_allow_html=True,
+)
+
 st.markdown("---")
 
 # Création des onglets
