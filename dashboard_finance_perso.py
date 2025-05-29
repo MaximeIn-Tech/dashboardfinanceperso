@@ -324,7 +324,7 @@ with tab1:
 
     if capital_initial:
         st.info(
-            f"📝 Pour un investissement initial de {capital_initial:.1f} € avec un versement de {versement_periodique} € {affichage_frequence} sur {duree_annees} ans avec un rendement de {taux_annuel} % par an."
+            f"📝 Pour un investissement initial de {capital_initial} € avec un versement de {versement_periodique} € {affichage_frequence} sur {duree_annees} ans avec un rendement de {taux_annuel} % par an."
         )
     else:
         # Résultats
@@ -442,6 +442,8 @@ with tab1:
 
         with col1:
             if calcul_apres_impot:
+
+                annees_abattement = interets_bruts / 4600
                 st.info(
                     f"""
                 **Fiscalité {type_placement} :**
@@ -450,6 +452,8 @@ with tab1:
                 {"- Abattement appliqué : 4 600 €" if type_placement == "Assurance-vie" and duree_annees >= 8 else ""}
                 - Impôts : {impots_sur_interets:,.2f} €
                 - **Intérêts nets : {interets_nets:,.2f} €**
+
+                Pour optimiser votre imposition, vous devriez retirer 4600€/an sur {annees_abattement:.2f} ans.
                 """
                 )
 
