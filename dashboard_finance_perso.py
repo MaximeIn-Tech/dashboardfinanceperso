@@ -359,11 +359,11 @@ with tab1:
             st.metric(
                 "🛒 Pouvoir d'achat final",
                 f"{pouvoir_achat_final:,.2f} €",
-                (
-                    f"-{(perte_pouvoir_achat/valeur_finale_nette)*100:.1f}%"
-                    if valeur_finale_nette > 0
-                    else "0%"
-                ),
+                # (
+                #     f"-{(perte_pouvoir_achat/valeur_finale_nette)*100:.1f}%"
+                #     if valeur_finale_nette > 0
+                #     else "0%"
+                # ),
             )
             # st.metric(
             #     "📉 Rendement réel annualisé",
