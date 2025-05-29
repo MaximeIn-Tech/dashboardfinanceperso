@@ -87,7 +87,6 @@ with tab1:
             help="À quelle fréquence les intérêts sont ajoutés au capital pour générer de nouveaux intérêts",
         )
 
-    with col2:
         moment_versement = st.selectbox(
             "Moment du versement",
             ["Début de période", "Fin de période"],
