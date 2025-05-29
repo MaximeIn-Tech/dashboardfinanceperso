@@ -324,12 +324,12 @@ with tab1:
 
     if capital_initial:
         st.info(
-            f"📝 Pour un investissement initial de {capital_initial} € avec un versement de {versement_periodique} € {affichage_frequence} sur {duree_annees} ans avec un rendement de {taux_annuel} % par an."
+            f"📝 Pour un investissement initial de {capital_initial:.1f} € avec un versement de {versement_periodique} € {affichage_frequence} sur {duree_annees} ans avec un rendement de {taux_annuel} % par an."
         )
     else:
         # Résultats
         st.info(
-            f"📝 Pour un investissement de {versement_periodique} € {affichage_frequence} sur {duree_annees} ans avec un rendement de {taux_annuel} % par an."
+            f"📝 Pour un investissement de {versement_periodique:.1f} € {affichage_frequence} sur {duree_annees} ans avec un rendement de {taux_annuel} % par an."
         )
     col1, col2, col3, col4 = st.columns(4)
     with col1:
