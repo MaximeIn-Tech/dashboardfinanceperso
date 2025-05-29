@@ -203,6 +203,7 @@ with tab1:
 
     with col2:
         if optimisation_fiscale:
+            st.write("")
             situation_familiale_ic = st.selectbox(
                 "Situation familiale",
                 [
