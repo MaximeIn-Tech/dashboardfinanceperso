@@ -20,27 +20,18 @@ with tab1:
     st.header("🏦 Calculateur d'Intérêts Composés")
 
     # Paramètres principaux
-    col1, col2, col3 = st.columns(3)
+    col1, col2 = st.columns(2)
 
     with col1:
-        calc_type = st.selectbox(
-            "Type de calcul",
-            ["Avec capital initial", "Sans capital initial"],
-            key="ic_calc_type",
+        st.subheader("💶 Capital et versements")
+        capital_initial = st.number_input(
+            "Capital initial (€)",
+            min_value=0.0,
+            value=0.0,
+            step=100.0,
+            key="ic_capital",
         )
 
-        if calc_type == "Avec capital initial":
-            capital_initial = st.number_input(
-                "Capital initial (€)",
-                min_value=0.0,
-                value=1000.0,
-                step=100.0,
-                key="ic_capital",
-            )
-        else:
-            capital_initial = 0.0
-
-    with col2:
         versement_periodique = st.number_input(
             "Versement périodique (€)",
             min_value=0.0,
@@ -49,13 +40,12 @@ with tab1:
             key="ic_versement",
         )
 
-        frequence = st.selectbox(
+        frequence_versement = st.selectbox(
             "Fréquence des versements",
             ["Mensuel", "Trimestriel", "Semestriel", "Annuel"],
-            key="ic_freq",
+            key="ic_freq_versement",
         )
 
-    with col3:
         taux_annuel = st.number_input(
             "Taux d'intérêt annuel (%)",
             min_value=0.0,
@@ -72,6 +62,26 @@ with tab1:
             value=10,
             step=1,
             key="ic_duree",
+        )
+
+    with col2:
+        st.subheader("⚙️ Paramètres de capitalisation")
+
+        frequence_capitalisation = st.selectbox(
+            "Fréquence de capitalisation des intérêts",
+            ["Mensuelle", "Trimestrielle", "Semestrielle", "Annuelle", "Continue"],
+            index=3,  # Annuelle par défaut
+            key="ic_freq_capitalisation",
+            help="À quelle fréquence les intérêts sont ajoutés au capital pour générer de nouveaux intérêts",
+        )
+
+    with col2:
+        moment_versement = st.selectbox(
+            "Moment du versement",
+            ["Début de période", "Fin de période"],
+            index=1,  # Fin de période par défaut
+            key="ic_moment_versement",
+            help="Les versements sont-ils effectués au début ou à la fin de chaque période ?",
         )
 
     # Options avancées
@@ -125,32 +135,120 @@ with tab1:
                         7.5 + 12.8
                     )  # 7,5% IR + 12,8% PS (après abattement)
                 else:
-                    taux_imposition = 12.8 + 12.8  # 12,8% IR + 12,8% PS
+                    taux_imposition = 30
         else:
             taux_imposition = 0.0
 
-    # Calculs pour intérêts composés
-    freq_map = {"Mensuel": 12, "Trimestriel": 4, "Semestriel": 2, "Annuel": 1}
-    n = freq_map[frequence]
+    # Mapping des fréquences
+    freq_versement_map = {"Mensuel": 12, "Trimestriel": 4, "Semestriel": 2, "Annuel": 1}
+    freq_capitalisation_map = {
+        "Mensuelle": 12,
+        "Trimestrielle": 4,
+        "Semestrielle": 2,
+        "Annuelle": 1,
+        "Continue": float("inf"),
+    }
+
+    m = freq_versement_map[frequence_versement]  # Fréquence des versements
+    n = freq_capitalisation_map[frequence_capitalisation]  # Fréquence de capitalisation
     r = taux_annuel / 100
     t = duree_annees
 
-    def calculer_interet_compose(P, PMT, r, n, t):
+    def calculer_interet_compose_avance(P, PMT, r, n, m, t, debut_periode=False):
+        """
+        Calcul des intérêts composés avec fréquences différentes pour capitalisation et versements
+
+        P : capital initial
+        PMT : montant du versement périodique
+        r : taux annuel (ex: 0.05 pour 5%)
+        n : fréquence de capitalisation (nombre de périodes d'intérêt par an)
+        m : fréquence des versements (nombre de versements par an)
+        t : durée en années
+        debut_periode : True si versements en début de période, False si fin de période
+        """
+
+        # Cas spécial : capitalisation continue
+        if n == float("inf"):
+            # Valeur future du capital initial avec capitalisation continue
+            FV_capital = P * np.exp(r * t)
+
+            # Pour les versements avec capitalisation continue
+            if PMT > 0 and r > 0:
+                # Facteur d'ajustement pour versements en début vs fin de période
+                facteur_moment = np.exp(r / m) if debut_periode else 1
+
+                # Somme des versements avec capitalisation continue
+                FV_versements = 0
+                for k in range(int(m * t)):
+                    temps_depuis_versement = t - k / m
+                    if debut_periode:
+                        temps_depuis_versement -= 1 / m
+                    FV_versements += (
+                        PMT * facteur_moment * np.exp(r * temps_depuis_versement)
+                    )
+            elif PMT > 0:
+                FV_versements = PMT * m * t
+            else:
+                FV_versements = 0
+
+            return FV_capital + FV_versements
+
+        # Cas normal : capitalisation discrète
+        # Valeur future du capital initial
         FV_capital = P * (1 + r / n) ** (n * t)
+
+        # Valeur future des versements
         if PMT > 0 and r > 0:
-            FV_versements = PMT * (((1 + r / n) ** (n * t) - 1) / (r / n))
-        elif PMT > 0 and r == 0:
-            FV_versements = PMT * n * t
+            # Facteur d'ajustement pour versements en début vs fin de période
+            facteur_moment = (1 + r / n) ** (n / m) if debut_periode else 1
+
+            FV_versements = 0
+            total_versements = int(m * t)
+
+            for k in range(total_versements):
+                # Temps restant après le k-ième versement (en années)
+                temps_restant = t - (k + 1) / m
+                if debut_periode:
+                    temps_restant += 1 / m
+
+                # Capitalisation du versement jusqu'à la fin
+                if temps_restant >= 0:
+                    FV_versements += (
+                        PMT * facteur_moment * (1 + r / n) ** (n * temps_restant)
+                    )
+        elif PMT > 0:
+            FV_versements = PMT * m * t
         else:
             FV_versements = 0
+
         return FV_capital + FV_versements
 
-    # Calculs avec options avancées
-    valeur_finale_brute = calculer_interet_compose(
-        capital_initial, versement_periodique, r, n, t
+    def calc_van_versements_avance(P, PMT, i, m, t, debut_periode=False):
+        """Calcul de la valeur actuelle nette des versements"""
+        van = P  # Capital initial à t=0
+
+        facteur_moment = (1 + i) ** (1 / m) if debut_periode else 1
+
+        total_versements = int(m * t)
+        for k in range(total_versements):
+            temps_versement = (k + 1) / m
+            if debut_periode:
+                temps_versement -= 1 / m
+            van += PMT * facteur_moment / ((1 + i) ** temps_versement)
+        return van
+
+    # Calculs avec les nouvelles options
+    debut_periode = moment_versement == "Début de période"
+
+    valeur_finale_brute = calculer_interet_compose_avance(
+        capital_initial, versement_periodique, r, n, m, t, debut_periode
     )
-    total_verse = capital_initial + (versement_periodique * n * t)
+    total_verse = capital_initial + (versement_periodique * m * t)
     interets_bruts = valeur_finale_brute - total_verse
+
+    van_versements = calc_van_versements_avance(
+        capital_initial, versement_periodique, taux_inflation / 100, m, t, debut_periode
+    )
 
     # Application de l'impôt sur les intérêts uniquement
     if calcul_apres_impot and interets_bruts > 0:
@@ -173,11 +271,37 @@ with tab1:
     if ajuster_inflation:
         pouvoir_achat_final = valeur_finale_nette / ((1 + taux_inflation / 100) ** t)
         perte_pouvoir_achat = valeur_finale_nette - pouvoir_achat_final
+
+        rendement_reel_annuel = (
+            ((pouvoir_achat_final / van_versements) ** (1 / t) - 1) * 100
+            if van_versements > 0
+            else 0
+        )
     else:
         pouvoir_achat_final = valeur_finale_nette
         perte_pouvoir_achat = 0
+        rendement_reel_annuel = (
+            ((valeur_finale_nette / van_versements) ** (1 / t) - 1) * 100
+            if van_versements > 0
+            else 0
+        )
 
     st.markdown("---")
+
+    # Affichage des paramètres de capitalisation
+    col1, col2 = st.columns(2)
+    with col1:
+        if frequence_capitalisation == "Continue":
+            st.info(f"🔄 **Capitalisation continue** - Intérêts calculés en permanence")
+        else:
+            st.info(
+                f"🔄 **Capitalisation {frequence_capitalisation.lower()}** - Intérêts calculés {freq_capitalisation_map[frequence_capitalisation]} fois par an"
+            )
+
+    with col2:
+        st.info(
+            f"📅 **Versements {frequence_versement.lower()}s** en **{moment_versement.lower()}**"
+        )
 
     # Résultats
     col1, col2, col3, col4 = st.columns(4)
@@ -212,12 +336,77 @@ with tab1:
                     else "0%"
                 ),
             )
+            # st.metric(
+            #     "📉 Rendement réel annualisé",
+            #     f"{rendement_reel_annuel:.2f} %",
+            # )
         elif calcul_apres_impot and impots_sur_interets > 0:
             st.metric(
                 "💸 Impôts payés",
                 f"{impots_sur_interets:,.2f} €",
                 f"{taux_imposition:.1f}%",
             )
+
+    # Comparaison des fréquences de capitalisation
+    if st.checkbox("📊 Comparer les fréquences de capitalisation", key="compare_freq"):
+        st.subheader("Impact de la fréquence de capitalisation")
+
+        freq_comparison = {
+            "Annuelle": 1,
+            "Semestrielle": 2,
+            "Trimestrielle": 4,
+            "Mensuelle": 12,
+            "Continue": float("inf"),
+        }
+
+        comparison_results = []
+        for freq_name, freq_value in freq_comparison.items():
+            valeur_comp = calculer_interet_compose_avance(
+                capital_initial,
+                versement_periodique,
+                r,
+                freq_value,
+                m,
+                t,
+                debut_periode,
+            )
+            interets_comp = valeur_comp - total_verse
+            comparison_results.append(
+                {
+                    "Fréquence": freq_name,
+                    "Valeur finale": valeur_comp,
+                    "Intérêts": interets_comp,
+                    "Gain vs Annuelle": (
+                        interets_comp - comparison_results[0]["Intérêts"]
+                        if comparison_results
+                        else 0
+                    ),
+                }
+            )
+
+        df_comparison = pd.DataFrame(comparison_results)
+
+        col1, col2 = st.columns(2)
+        with col1:
+            st.dataframe(
+                df_comparison.style.format(
+                    {
+                        "Valeur finale": "{:,.2f} €",
+                        "Intérêts": "{:,.2f} €",
+                        "Gain vs Annuelle": "{:+,.2f} €",
+                    }
+                ),
+                hide_index=True,
+            )
+
+        with col2:
+            fig_comp = px.bar(
+                df_comparison,
+                x="Fréquence",
+                y="Intérêts",
+                title="Intérêts selon la fréquence de capitalisation",
+            )
+            st.plotly_chart(fig_comp, use_container_width=True)
 
     # Informations détaillées selon les options
     if calcul_apres_impot or ajuster_inflation:
@@ -245,7 +434,8 @@ with tab1:
                 - Valeur nominale : {valeur_finale_nette:,.2f} €
                 - Valeur réelle : {pouvoir_achat_final:,.2f} €
                 - Perte de pouvoir d'achat : {perte_pouvoir_achat:,.2f} €
-                - **Rendement réel : {((pouvoir_achat_final/total_verse)*100-100):.1f}%**
+                - **Rendement réel annualisé : {rendement_reel_annuel:.2f}%**
+                - **Rendement réel sur la période : {((pouvoir_achat_final/van_versements)*100-100):.1f}%**
                 """
                 )
 
@@ -258,13 +448,13 @@ with tab1:
 
     for annee in annees:
         # Valeur brute
-        valeur_brute = calculer_interet_compose(
-            capital_initial, versement_periodique, r, n, annee
+        valeur_brute = calculer_interet_compose_avance(
+            capital_initial, versement_periodique, r, n, m, annee, debut_periode
         )
         valeurs_brutes.append(valeur_brute)
 
         # Versements cumulés
-        verse_cumule = capital_initial + (versement_periodique * n * annee)
+        verse_cumule = capital_initial + (versement_periodique * m * annee)
         versements_cumules.append(verse_cumule)
 
         # Valeur nette (après impôt)
@@ -281,7 +471,7 @@ with tab1:
             elif type_placement == "Assurance-vie" and annee >= 8:
                 taux_annee = 7.5 + 12.8
             elif type_placement == "Assurance-vie":
-                taux_annee = 12.8 + 12.8
+                taux_annee = 30
             else:
                 taux_annee = taux_imposition
 
@@ -365,12 +555,13 @@ with tab1:
         )
 
     fig.update_layout(
-        title="Évolution du capital avec options avancées",
+        title=f"Évolution du capital (Capitalisation {frequence_capitalisation.lower()}, Versements {moment_versement.lower()})",
         xaxis_title="Années",
         yaxis_title="Montant (€)",
         hovermode="x unified",
     )
     st.plotly_chart(fig, use_container_width=True)
+
 
 # ============= ONGLET 2: CALCULATEUR FIRE =============
 with tab2:
@@ -544,306 +735,6 @@ with tab2:
             yaxis_title="Patrimoine (€)",
         )
         st.plotly_chart(fig_fire, use_container_width=True)
-
-# # ============= ONGLET 3: ÉPARGNE LOGEMENT =============
-# with tab3:
-#     st.header("🏠 Calculateur d'Épargne Logement")
-
-#     col1, col2, col3 = st.columns(3)
-
-#     with col1:
-#         prix_logement = st.number_input(
-#             "Prix du logement (€)",
-#             min_value=0.0,
-#             value=200000.0,
-#             step=10000.0,
-#             key="log_prix",
-#         )
-
-#         apport_personnel = st.slider(
-#             "Apport personnel (%)",
-#             min_value=0,
-#             max_value=100,
-#             value=20,
-#             key="log_apport",
-#         )
-
-#     with col2:
-#         epargne_actuelle = st.number_input(
-#             "Épargne actuelle (€)",
-#             min_value=0.0,
-#             value=15000.0,
-#             step=1000.0,
-#             key="log_epargne",
-#         )
-
-#         epargne_mensuelle = st.number_input(
-#             "Épargne mensuelle (€)",
-#             min_value=0.0,
-#             value=500.0,
-#             step=50.0,
-#             key="log_mens",
-#         )
-
-#     with col3:
-#         taux_placement = st.number_input(
-#             "Taux de placement (%)",
-#             min_value=0.0,
-#             max_value=10.0,
-#             value=2.0,
-#             step=0.1,
-#             key="log_taux",
-#         )
-
-#         frais_notaire = st.number_input(
-#             "Frais de notaire (%)",
-#             min_value=0.0,
-#             max_value=10.0,
-#             value=7.5,
-#             step=0.5,
-#             key="log_frais",
-#         )
-
-#     # Calculs logement
-#     apport_euros = prix_logement * (apport_personnel / 100)
-#     frais_euros = prix_logement * (frais_notaire / 100)
-#     total_necessaire = apport_euros + frais_euros
-#     manque = max(0, total_necessaire - epargne_actuelle)
-
-#     if epargne_mensuelle > 0 and taux_placement > 0:
-#         r_mensuel = taux_placement / 100 / 12
-#         if manque > 0:
-#             mois_necessaires = np.log(
-#                 1 + (manque * r_mensuel) / epargne_mensuelle
-#             ) / np.log(1 + r_mensuel)
-#         else:
-#             mois_necessaires = 0
-#     elif epargne_mensuelle > 0:
-#         mois_necessaires = manque / epargne_mensuelle if manque > 0 else 0
-#     else:
-#         mois_necessaires = float("inf")
-
-#     st.markdown("---")
-
-#     # Résultats logement
-#     col1, col2, col3, col4 = st.columns(4)
-#     with col1:
-#         st.metric("🏠 Apport nécessaire", f"{apport_euros:,.0f} €")
-#     with col2:
-#         st.metric("📋 Frais de notaire", f"{frais_euros:,.0f} €")
-#     with col3:
-#         st.metric("💰 Total nécessaire", f"{total_necessaire:,.0f} €")
-#     with col4:
-#         if mois_necessaires < 600:
-#             st.metric("⏰ Temps d'épargne", f"{mois_necessaires/12:.1f} ans")
-#         else:
-#             st.metric("⏰ Temps d'épargne", "Trop long")
-
-#     # Simulation épargne logement
-#     if mois_necessaires < 120:  # Moins de 10 ans
-#         mois_sim = list(range(0, int(mois_necessaires) + 12, 3))  # Tous les 3 mois
-#         epargne_evolution = []
-
-#         for mois in mois_sim:
-#             if taux_placement > 0:
-#                 r_mensuel = taux_placement / 100 / 12
-#                 epargne = epargne_actuelle * (1 + r_mensuel) ** mois
-#                 if epargne_mensuelle > 0 and mois > 0:
-#                     epargne += epargne_mensuelle * (
-#                         ((1 + r_mensuel) ** mois - 1) / r_mensuel
-#                     )
-#             else:
-#                 epargne = epargne_actuelle + (epargne_mensuelle * mois)
-#             epargne_evolution.append(epargne)
-
-#         fig_log = go.Figure()
-#         fig_log.add_trace(
-#             go.Scatter(
-#                 x=[m / 12 for m in mois_sim],
-#                 y=epargne_evolution,
-#                 name="Épargne projetée",
-#                 line=dict(color="#2ca02c"),
-#             )
-#         )
-#         fig_log.add_hline(
-#             y=total_necessaire,
-#             line_dash="dash",
-#             line_color="red",
-#             annotation_text="Objectif",
-#         )
-#         fig_log.update_layout(
-#             title="Évolution de l'épargne logement",
-#             xaxis_title="Années",
-#             yaxis_title="Épargne (€)",
-#         )
-#         st.plotly_chart(fig_log, use_container_width=True)
-
-# # ============= ONGLET 4: COMPARATEUR PLACEMENTS =============
-# with tab4:
-#     st.header("📊 Comparateur de Placements")
-
-#     st.subheader("Paramètres communs")
-#     col1, col2 = st.columns(2)
-#     with col1:
-#         montant_initial = st.number_input(
-#             "Montant initial (€)",
-#             min_value=0.0,
-#             value=10000.0,
-#             step=1000.0,
-#             key="comp_initial",
-#         )
-#         versement_comp = st.number_input(
-#             "Versement mensuel (€)",
-#             min_value=0.0,
-#             value=200.0,
-#             step=50.0,
-#             key="comp_versement",
-#         )
-#     with col2:
-#         duree_comp = st.number_input(
-#             "Durée (années)", min_value=1, max_value=40, value=15, key="comp_duree"
-#         )
-
-#     st.subheader("Taux de rendement par placement")
-#     col1, col2, col3, col4 = st.columns(4)
-
-#     with col1:
-#         taux_livret = st.number_input(
-#             "Livret A (%)",
-#             min_value=0.0,
-#             max_value=10.0,
-#             value=3.0,
-#             step=0.1,
-#             key="comp_livret",
-#         )
-#         taux_ldds = st.number_input(
-#             "LDDS (%)",
-#             min_value=0.0,
-#             max_value=10.0,
-#             value=3.0,
-#             step=0.1,
-#             key="comp_ldds",
-#         )
-
-#     with col2:
-#         taux_assurance = st.number_input(
-#             "Assurance-vie (%)",
-#             min_value=0.0,
-#             max_value=15.0,
-#             value=4.5,
-#             step=0.1,
-#             key="comp_av",
-#         )
-#         taux_pea = st.number_input(
-#             "PEA (%)",
-#             min_value=0.0,
-#             max_value=15.0,
-#             value=7.0,
-#             step=0.5,
-#             key="comp_pea",
-#         )
-
-#     with col3:
-#         taux_cto = st.number_input(
-#             "CTO (%)",
-#             min_value=0.0,
-#             max_value=15.0,
-#             value=8.0,
-#             step=0.5,
-#             key="comp_cto",
-#         )
-#         taux_crypto = st.number_input(
-#             "Crypto (%)",
-#             min_value=0.0,
-#             max_value=50.0,
-#             value=15.0,
-#             step=1.0,
-#             key="comp_crypto",
-#         )
-
-#     with col4:
-#         taux_immobilier = st.number_input(
-#             "Immobilier (%)",
-#             min_value=0.0,
-#             max_value=20.0,
-#             value=5.0,
-#             step=0.5,
-#             key="comp_immo",
-#         )
-#         taux_or = st.number_input(
-#             "Or (%)", min_value=0.0, max_value=15.0, value=3.5, step=0.5, key="comp_or"
-#         )
-
-#     # Calculs comparatifs
-#     placements = {
-#         "Livret A": taux_livret,
-#         "LDDS": taux_ldds,
-#         "Assurance-vie": taux_assurance,
-#         "PEA": taux_pea,
-#         "CTO": taux_cto,
-#         "Crypto": taux_crypto,
-#         "Immobilier": taux_immobilier,
-#         "Or": taux_or,
-#     }
-
-#     resultats = {}
-#     for nom, taux in placements.items():
-#         r_mensuel = taux / 100 / 12
-#         if r_mensuel > 0:
-#             valeur_finale = montant_initial * (1 + r_mensuel) ** (12 * duree_comp)
-#             if versement_comp > 0:
-#                 valeur_finale += versement_comp * (
-#                     ((1 + r_mensuel) ** (12 * duree_comp) - 1) / r_mensuel
-#                 )
-#         else:
-#             valeur_finale = montant_initial + (versement_comp * 12 * duree_comp)
-
-#         total_verse = montant_initial + (versement_comp * 12 * duree_comp)
-#         gain = valeur_finale - total_verse
-#         resultats[nom] = {"valeur_finale": valeur_finale, "gain": gain, "taux": taux}
-
-#     st.markdown("---")
-
-#     # Tableau comparatif
-#     df_comp = pd.DataFrame(
-#         {
-#             "Placement": list(resultats.keys()),
-#             "Taux (%)": [resultats[p]["taux"] for p in resultats.keys()],
-#             "Valeur finale (€)": [
-#                 f"{resultats[p]['valeur_finale']:,.0f}" for p in resultats.keys()
-#             ],
-#             "Gains (€)": [f"{resultats[p]['gain']:,.0f}" for p in resultats.keys()],
-#             "Rendement total (%)": [
-#                 f"{(resultats[p]['gain']/(montant_initial + versement_comp * 12 * duree_comp))*100:.1f}"
-#                 for p in resultats.keys()
-#             ],
-#         }
-#     )
-
-#     st.dataframe(df_comp, use_container_width=True)
-
-#     # Graphique comparatif
-#     fig_comp = px.bar(
-#         x=list(resultats.keys()),
-#         y=[resultats[p]["valeur_finale"] for p in resultats.keys()],
-#         title="Comparaison des valeurs finales par placement",
-#         labels={"x": "Placements", "y": "Valeur finale (€)"},
-#     )
-#     st.plotly_chart(fig_comp, use_container_width=True)
-
-#     # Top 3 des placements
-#     top_placements = sorted(
-#         resultats.items(), key=lambda x: x[1]["valeur_finale"], reverse=True
-#     )[:3]
-
-#     col1, col2, col3 = st.columns(3)
-#     for i, (nom, data) in enumerate(top_placements):
-#         with [col1, col2, col3][i]:
-#             st.metric(
-#                 f"🏆 #{i+1} {nom}",
-#                 f"{data['valeur_finale']:,.0f} €",
-#                 f"+{data['gain']:,.0f} €",
-#             )
 
 st.markdown("---")
 st.markdown(
