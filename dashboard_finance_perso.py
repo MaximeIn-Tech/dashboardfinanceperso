@@ -6,36 +6,6 @@ import plotly.express as px
 import plotly.graph_objects as go
 import streamlit as st
 
-
-def calculer_tmi_simplifiee(revenus_annuels, nb_parts=1, annee=2024):
-    """Calcul simplifié de la TMI"""
-    if annee == 2024:
-        tranches = [
-            (0, 10777, 0),
-            (10777, 27478, 11),
-            (27478, 78570, 30),
-            (78570, 168994, 41),
-            (168994, float("inf"), 45),
-        ]
-    else:  # 2023
-        tranches = [
-            (0, 10225, 0),
-            (10225, 26070, 11),
-            (26070, 74545, 30),
-            (74545, 160336, 41),
-            (160336, float("inf"), 45),
-        ]
-
-    quotient_familial = revenus_annuels / nb_parts
-    tmi = 0
-
-    for seuil_inf, seuil_sup, taux in tranches:
-        if quotient_familial > seuil_inf:
-            tmi = taux
-
-    return tmi
-
-
 # Configuration de la page
 st.set_page_config(page_title="Calculateurs Financiers", page_icon="💰", layout="wide")
 
@@ -107,7 +77,6 @@ with tab1:
         )
 
     with col2:
-
         st.subheader("⚙️ Paramètres de capitalisation")
 
         frequence_capitalisation = st.selectbox(
@@ -126,95 +95,38 @@ with tab1:
             help="Les versements sont-ils effectués au début ou à la fin de chaque période ?",
         )
 
-        st.subheader("🧾 Fiscalité et TMI")
-
-        calcul_apres_impot = st.checkbox(
-            "Calcul après impôt", value=False, key="ic_impot_check"
-        )
-
-        if calcul_apres_impot:
-            type_placement = st.selectbox(
-                "Type de placement",
-                ["CTO (Compte-titres ordinaire)", "PEA", "Assurance-vie"],
-                key="ic_placement",
-            )
-
-            # Nouvelle option TMI personnalisée
-            utiliser_tmi_personnalisee = st.checkbox(
-                "Utiliser ma TMI personnelle",
-                value=False,
-                key="ic_tmi_perso_check",
-                help="Utilise votre Tranche Marginale d'Imposition pour optimiser le calcul fiscal",
-            )
-
-            if utiliser_tmi_personnalisee:
-                col_tmi1, col_tmi2 = st.columns(2)
-
-                with col_tmi1:
-                    # Option 1: TMI manuelle
-                    saisie_tmi = st.radio(
-                        "Comment définir votre TMI ?",
-                        ["Saisie manuelle", "Calcul automatique"],
-                        key="ic_saisie_tmi",
-                    )
-
-                    if saisie_tmi == "Saisie manuelle":
-                        tmi_utilisateur = st.selectbox(
-                            "Votre TMI (%)",
-                            [0, 11, 30, 41, 45],
-                            index=2,  # 30% par défaut
-                            key="ic_tmi_manuelle",
-                        )
-                    else:
-                        # Calcul automatique TMI
-                        revenus_annuels = st.number_input(
-                            "Revenus annuels (€)",
-                            min_value=0.0,
-                            value=45000.0,
-                            step=1000.0,
-                            key="ic_revenus",
-                        )
-
-                        situation_familiale = st.selectbox(
-                            "Situation familiale",
-                            [
-                                "Célibataire",
-                                "Marié(e)/Pacsé(e)",
-                                "Couple + 1 enfant",
-                                "Couple + 2 enfants",
-                                "Couple + 3 enfants",
-                            ],
-                            key="ic_situation",
-                        )
-
-                        parts_fiscales = {
-                            "Célibataire": 1,
-                            "Marié(e)/Pacsé(e)": 2,
-                            "Couple + 1 enfant": 2.5,
-                            "Couple + 2 enfants": 3,
-                            "Couple + 3 enfants": 4,
-                        }
-
-                        nb_parts = parts_fiscales[situation_familiale]
-                        tmi_utilisateur = calculer_tmi_simplifiee(
-                            revenus_annuels, nb_parts
-                        )
-
-                with col_tmi2:
-                    if saisie_tmi == "Calcul automatique":
-                        st.metric("Votre TMI calculée", f"{tmi_utilisateur}%")
-
-                    # Information sur l'optimisation
-                    st.info(
-                        f"""
-                    **Optimisation fiscale :**
-                    Avec votre TMI de {tmi_utilisateur}%, certains placements peuvent être plus avantageux que le PFU de 30%.
-                    """
-                    )
-
     # Options avancées
     st.subheader("Options avancées")
     col1, col2, col3 = st.columns(3)
+
+    # Fonction helper pour calculer la TMI
+    def calculer_tmi_simplifiee(revenus_annuels, nb_parts=1, annee=2024):
+        """Calcul simplifié de la TMI"""
+        if annee == 2024:
+            tranches = [
+                (0, 10777, 0),
+                (10777, 27478, 11),
+                (27478, 78570, 30),
+                (78570, 168994, 41),
+                (168994, float("inf"), 45),
+            ]
+        else:  # 2023
+            tranches = [
+                (0, 10225, 0),
+                (10225, 26070, 11),
+                (26070, 74545, 30),
+                (74545, 160336, 41),
+                (160336, float("inf"), 45),
+            ]
+
+        quotient_familial = revenus_annuels / nb_parts
+        tmi = 0
+
+        for seuil_inf, seuil_sup, taux in tranches:
+            if quotient_familial > seuil_inf:
+                tmi = taux
+
+        return tmi
 
     with col1:
         ajuster_inflation = st.checkbox(
