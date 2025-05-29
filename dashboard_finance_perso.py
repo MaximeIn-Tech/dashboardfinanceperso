@@ -324,7 +324,7 @@ with tab1:
 
     # Résultats
     st.info(
-        f"📝 Pour un investissement de {versement_periodique} € par {affichage_frequence} sur {duree_annees} ans avec un rendement de {taux_annuel} % par an."
+        f"📝 Pour un investissement de {versement_periodique} € {affichage_frequence} sur {duree_annees} ans avec un rendement de {taux_annuel} % par an."
     )
     col1, col2, col3, col4 = st.columns(4)
     with col1:
