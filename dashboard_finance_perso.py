@@ -23,7 +23,9 @@ st.markdown(
 st.markdown("---")
 
 # Création des onglets
-tab1, tab2 = st.tabs(["🏦 Intérêts Composés", "🔥 Calculateur FIRE"])
+tab1, tab2, tab3 = st.tabs(
+    ["🏦 Intérêts Composés", "🔥 Calculateur FIRE", "🧮 Calculateur d'Impôts"]
+)
 
 # ============= ONGLET 1: INTÉRÊTS COMPOSÉS =============
 with tab1:
@@ -768,6 +770,315 @@ with tab2:
             yaxis_title="Patrimoine (€)",
         )
         st.plotly_chart(fig_fire, use_container_width=True)
+
+# ============= ONGLET 3: CALCULATEUR TMI =============
+with tab3:
+    st.header("🧮 Calculateur d'Impôts et TMI")
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+        st.subheader("💰 Revenus")
+        revenus_imposables = st.number_input(
+            "Revenus imposables annuels (€)",
+            min_value=0.0,
+            value=45000.0,
+            step=1000.0,
+            key="tmi_revenus",
+        )
+
+        situation_familiale = st.selectbox(
+            "Situation familiale",
+            [
+                "Célibataire",
+                "Marié(e)/Pacsé(e)",
+                "Marié(e) avec 1 enfant",
+                "Marié(e) avec 2 enfants",
+                "Marié(e) avec 3 enfants",
+            ],
+            key="tmi_situation",
+        )
+
+        parts_fiscales = {
+            "Célibataire": 1,
+            "Marié(e)/Pacsé(e)": 2,
+            "Marié(e) avec 1 enfant": 2.5,
+            "Marié(e) avec 2 enfants": 3,
+            "Marié(e) avec 3 enfants": 4,
+        }
+
+        nb_parts = parts_fiscales[situation_familiale]
+
+    with col2:
+        st.subheader("⚙️ Paramètres")
+        annee_fiscale = st.selectbox("Année fiscale", [2024, 2023], key="tmi_annee")
+
+        st.info(f"📊 Nombre de parts fiscales : {nb_parts}")
+
+    # Barème 2024 (revenus 2023)
+    if annee_fiscale == 2024:
+        tranches = [
+            (0, 10777, 0),
+            (10777, 27478, 11),
+            (27478, 78570, 30),
+            (78570, 168994, 41),
+            (168994, float("inf"), 45),
+        ]
+    else:  # 2023
+        tranches = [
+            (0, 10225, 0),
+            (10225, 26070, 11),
+            (26070, 74545, 30),
+            (74545, 160336, 41),
+            (160336, float("inf"), 45),
+        ]
+
+    # Calcul du quotient familial
+    quotient_familial = revenus_imposables / nb_parts
+
+    # Calcul de l'impôt par part
+    impot_par_part = 0
+    tmi = 0
+
+    for i, (seuil_inf, seuil_sup, taux) in enumerate(tranches):
+        if quotient_familial > seuil_inf:
+            base_imposable = min(quotient_familial, seuil_sup) - seuil_inf
+            impot_par_part += base_imposable * (taux / 100)
+            if quotient_familial > seuil_inf:
+                tmi = taux
+
+    # Impôt total
+    impot_brut = impot_par_part * nb_parts
+
+    # Décote (si applicable)
+    if nb_parts <= 2:
+        seuil_decote = 1929 if annee_fiscale == 2024 else 1837
+        plafond_decote = 2590 if annee_fiscale == 2024 else 2469
+    else:
+        seuil_decote = (1929 if annee_fiscale == 2024 else 1837) * nb_parts / 2
+        plafond_decote = (2590 if annee_fiscale == 2024 else 2469) * nb_parts / 2
+
+    decote = 0
+    if impot_brut < seuil_decote:
+        decote = min(impot_brut, (seuil_decote - impot_brut) * 0.45)
+
+    impot_net = max(0, impot_brut - decote)
+
+    # Taux moyen
+    taux_moyen = (impot_net / revenus_imposables * 100) if revenus_imposables > 0 else 0
+
+    # Revenus nets après IR
+    revenus_nets_ir = revenus_imposables - impot_net
+
+    # Calcul des cotisations sociales (estimation)
+    if st.checkbox("Inclure les cotisations sociales", key="tmi_cotisations"):
+        st.subheader("🏥 Cotisations sociales")
+
+        statut = st.selectbox(
+            "Statut", ["Salarié", "Fonctionnaire", "Indépendant"], key="tmi_statut"
+        )
+
+        if statut == "Salarié":
+            cotisations_rate = 0.225  # ~22.5% (estimation globale)
+        elif statut == "Fonctionnaire":
+            cotisations_rate = 0.21  # ~21%
+        else:  # Indépendant
+            cotisations_rate = 0.45  # ~45% (charges sociales élevées)
+
+        cotisations = revenus_imposables * cotisations_rate
+        revenus_nets_total = revenus_imposables - impot_net - cotisations
+    else:
+        cotisations = 0
+        revenus_nets_total = revenus_nets_ir
+
+    st.markdown("---")
+
+    # Résultats
+    col1, col2, col3, col4 = st.columns(4)
+
+    with col1:
+        st.metric("💼 Revenus bruts", f"{revenus_imposables:,.0f} €")
+
+    with col2:
+        st.metric(
+            "📊 TMI",
+            f"{tmi}%",
+            help="Tranche Marginale d'Imposition - taux appliqué à votre dernière tranche de revenus",
+        )
+
+    with col3:
+        st.metric(
+            "📈 Taux moyen",
+            f"{taux_moyen:.1f}%",
+            help="Taux réel d'imposition sur l'ensemble de vos revenus",
+        )
+
+    with col4:
+        st.metric("💸 Impôt sur le revenu", f"{impot_net:,.0f} €")
+
+    if cotisations > 0:
+        col1, col2, col3, col4 = st.columns(4)
+        with col1:
+            st.metric("🏥 Cotisations sociales", f"{cotisations:,.0f} €")
+        with col2:
+            st.metric("🔢 Total prélèvements", f"{impot_net + cotisations:,.0f} €")
+        with col3:
+            st.metric("💰 Revenus nets totaux", f"{revenus_nets_total:,.0f} €")
+        with col4:
+            taux_global = (
+                ((impot_net + cotisations) / revenus_imposables * 100)
+                if revenus_imposables > 0
+                else 0
+            )
+            st.metric("📊 Taux global", f"{taux_global:.1f}%")
+
+    # Détail des tranches
+    st.subheader("📋 Détail du calcul par tranches")
+
+    detail_tranches = []
+    cumul_impot = 0
+
+    for i, (seuil_inf, seuil_sup, taux) in enumerate(tranches):
+        if quotient_familial > seuil_inf:
+            base = min(quotient_familial, seuil_sup) - seuil_inf
+            impot_tranche = base * (taux / 100)
+            cumul_impot += impot_tranche
+
+            if seuil_sup == float("inf"):
+                tranche_desc = f"Au-delà de {seuil_inf:,.0f} €"
+            else:
+                tranche_desc = f"De {seuil_inf:,.0f} € à {seuil_sup:,.0f} €"
+
+            detail_tranches.append(
+                {
+                    "Tranche": tranche_desc,
+                    "Taux": f"{taux}%",
+                    "Base (QF)": f"{base:,.0f} €",
+                    "Impôt/part": f"{impot_tranche:,.0f} €",
+                    "Impôt total": f"{impot_tranche * nb_parts:,.0f} €",
+                }
+            )
+
+    if detail_tranches:
+        df_tranches = pd.DataFrame(detail_tranches)
+        st.dataframe(df_tranches, hide_index=True)
+
+    if decote > 0:
+        st.info(f"✅ Décote appliquée : {decote:,.0f} € (impôt réduit)")
+
+    # Graphique répartition
+    col1, col2 = st.columns(2)
+
+    with col1:
+        # Graphique camembert
+        if cotisations > 0:
+            values = [revenus_nets_total, impot_net, cotisations]
+            labels = ["Revenus nets", "Impôt sur le revenu", "Cotisations sociales"]
+            colors = ["#2ca02c", "#d62728", "#ff7f0e"]
+        else:
+            values = [revenus_nets_ir, impot_net]
+            labels = ["Revenus nets", "Impôt sur le revenu"]
+            colors = ["#2ca02c", "#d62728"]
+
+        fig_pie = px.pie(
+            values=values,
+            names=labels,
+            title="Répartition des revenus",
+            color_discrete_sequence=colors,
+        )
+        st.plotly_chart(fig_pie, use_container_width=True)
+
+    with col2:
+        # Simulation d'augmentation
+        st.subheader("🔮 Impact d'une augmentation")
+        augmentation = st.slider(
+            "Augmentation de salaire (€)",
+            min_value=0,
+            max_value=10000,
+            value=1000,
+            step=100,
+            key="tmi_augmentation",
+        )
+
+        if augmentation > 0:
+            nouveaux_revenus = revenus_imposables + augmentation
+            nouveau_quotient = nouveaux_revenus / nb_parts
+
+            # Recalcul rapide
+            nouvel_impot_par_part = 0
+            nouvelle_tmi = 0
+
+            for seuil_inf, seuil_sup, taux in tranches:
+                if nouveau_quotient > seuil_inf:
+                    base_imposable = min(nouveau_quotient, seuil_sup) - seuil_inf
+                    nouvel_impot_par_part += base_imposable * (taux / 100)
+                    if nouveau_quotient > seuil_inf:
+                        nouvelle_tmi = taux
+
+            nouvel_impot_brut = nouvel_impot_par_part * nb_parts
+
+            # Nouvelle décote
+            nouvelle_decote = 0
+            if nouvel_impot_brut < seuil_decote:
+                nouvelle_decote = min(
+                    nouvel_impot_brut, (seuil_decote - nouvel_impot_brut) * 0.45
+                )
+
+            nouvel_impot_net = max(0, nouvel_impot_brut - nouvelle_decote)
+
+            augmentation_impot = nouvel_impot_net - impot_net
+            augmentation_nette = augmentation - augmentation_impot
+
+            if cotisations > 0:
+                nouvelles_cotisations = nouveaux_revenus * cotisations_rate
+                augmentation_cotisations = nouvelles_cotisations - cotisations
+                augmentation_nette -= augmentation_cotisations
+                taux_prelevement = (
+                    (augmentation_impot + augmentation_cotisations) / augmentation * 100
+                )
+            else:
+                taux_prelevement = augmentation_impot / augmentation * 100
+
+            st.info(
+                f"""
+            **Pour +{augmentation:,.0f} € bruts :**
+            - Nouvel impôt : +{augmentation_impot:,.0f} €
+            {"- Nouvelles cotisations : +" + f"{augmentation_cotisations:,.0f}" + " €" if cotisations > 0 else ""}
+            - **Gain net : +{augmentation_nette:,.0f} €**
+            - **Taux de prélèvement : {taux_prelevement:.1f}%**
+            """
+            )
+
+    # Conseils d'optimisation
+    st.subheader("💡 Conseils d'optimisation fiscale")
+
+    conseils = []
+
+    if tmi >= 30:
+        conseils.append(
+            "🏦 **PEA** : Optimisez vos investissements avec un PEA (exonéré après 5 ans)"
+        )
+        conseils.append(
+            "🏠 **Assurance-vie** : Profitez de l'abattement de 4 600€/an après 8 ans"
+        )
+
+    if tmi >= 41:
+        conseils.append("📊 **PER** : Déduction fiscale jusqu'à 10% de vos revenus")
+        conseils.append("🏡 **Investissement locatif** : Déficit foncier déductible")
+
+    if revenus_imposables > 50000:
+        conseils.append("🎯 **Don aux associations** : 66% de réduction d'impôt")
+        conseils.append(
+            "💼 **FCPI/FIP** : Réduction d'impôt de 18% (placements risqués)"
+        )
+
+    if situation_familiale == "Célibataire":
+        conseils.append(
+            "💑 **PACS** : Peut être avantageux fiscalement selon les revenus du conjoint"
+        )
+
+    for conseil in conseils:
+        st.info(conseil)
 
 st.markdown("---")
 st.markdown(
