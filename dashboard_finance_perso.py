@@ -211,6 +211,7 @@ with tab1:
             )
 
     with col3:
+        st.header("Test")
         if calcul_apres_impot:
             # Checkbox pour l'optimisation fiscale avancée
             optimisation_fiscale = st.checkbox(
