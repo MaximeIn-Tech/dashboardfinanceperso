@@ -671,17 +671,19 @@ with tab1:
                         info_revenus += f"- Votre TMI : {tmi_personnelle}%\n"
 
                 st.info(
-                    f"""
-                **Fiscalité {type_placement} :**
-                {info_revenus}- Intérêts bruts : {interets_bruts:,.2f} €
-                {"- Abattement appliqué : {:,.0f} €".format(abattement_applique) if abattement_applique > 0 else ""}
-                - Intérêts imposables : {interets_imposables:,.2f} €
-                - Taux d'imposition : {taux_imposition:.1f}%
-                - Impôts : {impots_sur_interets:,.2f} €
-                - **Intérêts nets : {interets_nets:,.2f} €**
+                    f"""### 💼 Fiscalité {type_placement}
 
-                {conseil_abattement}
-                """
+{info_revenus}
+• **Intérêts bruts** : {interets_bruts:,.2f} €
+
+{"• **Abattement appliqué** : {:,.0f} €\n".format(abattement_applique) if abattement_applique > 0 else ""}\
+• **Intérêts imposables** : {interets_imposables:,.2f} €
+• **Taux d'imposition** : {taux_imposition:.1f} %
+• **Impôts à payer** : {impots_sur_interets:,.2f} €
+• ✅ **Intérêts nets après impôts** : {interets_nets:,.2f} €
+
+{conseil_abattement}
+"""
                 )
 
         with col2:
