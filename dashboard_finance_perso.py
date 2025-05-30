@@ -128,6 +128,59 @@ with tab1:
 
         return tmi
 
+    def calculer_taux_imposition_effectif(
+        type_placement,
+        duree_annees,
+        type_revenus,
+        tmi_personnelle=None,
+        utiliser_tmi=False,
+    ):
+        """Calcule le taux d'imposition effectif selon le type de placement et la durée"""
+
+        if not utiliser_tmi or tmi_personnelle is None:
+            # Utilisation des taux standard (PFU)
+            if type_placement == "CTO (Compte-titres ordinaire)":
+                return 30.0  # PFU : 17,2% IR + 12,8% PS
+            elif type_placement == "PEA":
+                if duree_annees >= 5:
+                    return 12.8  # Seulement prélèvements sociaux
+                else:
+                    return 30.0  # PFU complet si retrait avant 5 ans
+            else:  # Assurance-vie
+                if duree_annees >= 8:
+                    return 7.5 + 12.8  # 7,5% IR + 12,8% PS (après abattement)
+                else:
+                    return 30.0
+        else:
+            # Utilisation de la TMI personnelle
+            if type_placement == "CTO (Compte-titres ordinaire)":
+                if type_revenus == "Plus-values mobilières":
+                    return 12.8  # Seulement prélèvements sociaux pour les PV
+                elif type_revenus == "Dividendes":
+                    # Option entre PFU (30%) ou barème progressif (TMI + 12,8%)
+                    taux_bareme = tmi_personnelle + 12.8
+                    return min(30.0, taux_bareme)  # Le plus avantageux
+                else:  # Intérêts
+                    taux_bareme = tmi_personnelle + 12.8
+                    return min(30.0, taux_bareme)
+            elif type_placement == "PEA":
+                if duree_annees >= 5:
+                    return 12.8  # Seulement prélèvements sociaux
+                else:
+                    # Avant 5 ans, utilisation du barème ou PFU
+                    taux_bareme = tmi_personnelle + 12.8
+                    return min(30.0, taux_bareme)
+            else:  # Assurance-vie
+                if duree_annees >= 8:
+                    if type_revenus == "Plus-values mobilières":
+                        return 7.5 + 12.8  # Taux spécifique AV
+                    else:
+                        taux_bareme = min(tmi_personnelle, 7.5) + 12.8
+                        return taux_bareme
+                else:
+                    taux_bareme = tmi_personnelle + 12.8
+                    return min(30.0, taux_bareme)
+
     with col1:
         ajuster_inflation = st.checkbox(
             "Ajuster à l'inflation", value=False, key="ic_inflation_check"
@@ -159,104 +212,126 @@ with tab1:
 
     with col3:
         if calcul_apres_impot:
+            # Checkbox pour l'optimisation fiscale avancée
+            optimisation_fiscale = st.checkbox(
+                "Utiliser ma TMI personnelle",
+                value=False,
+                key="ic_optimisation_fiscale",
+                help="Utilise votre TMI réelle pour optimiser le calcul d'impôt",
+            )
+
+    # Section TMI personnalisée (affichage conditionnel)
+    if calcul_apres_impot and optimisation_fiscale:
+        st.subheader("🧮 Optimisation fiscale personnalisée")
+
+        col1, col2, col3, col4 = st.columns([1.2, 1, 1, 1])
+
+        # Revenus annuels
+        with col1:
+            revenus_annuels_tmi = st.number_input(
+                "Vos revenus annuels (€)",
+                min_value=0.0,
+                value=45000.0,
+                step=1000.0,
+                key="ic_revenus_tmi",
+                help="Revenus imposables avant déductions",
+            )
+
+        # Situation familiale
+        with col2:
+            situation_familiale_ic = st.selectbox(
+                "Situation familiale",
+                [
+                    "Célibataire",
+                    "Marié(e)/Pacsé(e)",
+                    "Couple + 1 enfant",
+                    "Couple + 2 enfants",
+                    "Couple + 3 enfants",
+                ],
+                key="ic_situation",
+            )
+
+            parts_fiscales_ic = {
+                "Célibataire": 1,
+                "Marié(e)/Pacsé(e)": 2,
+                "Couple + 1 enfant": 2.5,
+                "Couple + 2 enfants": 3,
+                "Couple + 3 enfants": 4,
+            }
+
+            nb_parts_ic = parts_fiscales_ic[situation_familiale_ic]
+
+        # Type de revenus générés
+        with col3:
+            optimisation_type = st.selectbox(
+                "Type de revenus générés",
+                [
+                    "Plus-values mobilières",
+                    "Intérêts (livrets/obligations)",
+                    "Dividendes",
+                ],
+                key="ic_optimisation_type",
+                help="Type de revenus générés par votre placement",
+            )
+
+        # Calcul et affichage TMI
+        with col4:
+            tmi_personnelle = calculer_tmi_simplifiee(revenus_annuels_tmi, nb_parts_ic)
+            st.metric("Votre TMI", f"{tmi_personnelle}%")
+
+            # Calcul du taux effectif avec TMI
+            taux_effectif_tmi = calculer_taux_imposition_effectif(
+                type_placement, duree_annees, optimisation_type, tmi_personnelle, True
+            )
+            st.metric("Taux effectif", f"{taux_effectif_tmi:.1f}%")
+
+    # Calcul du taux d'imposition à utiliser
+    if calcul_apres_impot:
+        if optimisation_fiscale:
+            taux_imposition = calculer_taux_imposition_effectif(
+                type_placement, duree_annees, optimisation_type, tmi_personnelle, True
+            )
+            type_revenus_utilise = optimisation_type
+        else:
+            taux_imposition = calculer_taux_imposition_effectif(
+                type_placement, duree_annees, "Standard", None, False
+            )
+            type_revenus_utilise = "Standard"
+
+        # Affichage des informations sur le type de placement
+        if not optimisation_fiscale:
             if type_placement == "CTO (Compte-titres ordinaire)":
                 st.info("📋 **CTO** : PFU de 30% (17,2% IR + 12,8% PS)")
-                taux_imposition = 30.0
             elif type_placement == "PEA":
-                st.info("📋 **PEA** : Exonéré après 5 ans + 12,8% PS")
                 if duree_annees >= 5:
-                    taux_imposition = 12.8  # Seulement prélèvements sociaux
+                    st.info("📋 **PEA** : Exonéré après 5 ans + 12,8% PS")
                 else:
-                    taux_imposition = 30.0  # PFU complet si retrait avant 5 ans
+                    st.info("📋 **PEA** : PFU de 30% si retrait avant 5 ans")
             else:  # Assurance-vie
-                st.info("📋 **AV** : Abattement + prélèvements selon ancienneté")
                 if duree_annees >= 8:
-                    taux_imposition = (
-                        7.5 + 12.8
-                    )  # 7,5% IR + 12,8% PS (après abattement)
+                    st.info(
+                        "📋 **AV** : 7,5% + 12,8% PS après 8 ans (avec abattement 4 600€)"
+                    )
                 else:
-                    taux_imposition = 30
-        else:
-            taux_imposition = 0.0
+                    st.info("📋 **AV** : PFU de 30% avant 8 ans")
+    else:
+        taux_imposition = 0.0
+        type_revenus_utilise = "Aucun"
 
-        # TODO : A reprendre en main, je veux que ce soit calculé aussi dans les impôts !
-        # st.subheader("🧮 Optimisation fiscale avancée")
-
-        # # Checkbox principale
-        # optimisation_fiscale = st.checkbox(
-        #     "Calcul avec TMI personnelle",
-        #     value=False,
-        #     key="ic_optimisation_fiscale",
-        #     help="Utilise votre TMI réelle pour calculer l'impôt sur les plus-values",
-        # )
-        # # Affichage conditionnel des paramètres avancés
-        # if optimisation_fiscale:
-        #     col1, col2, col3 = st.columns([1.2, 1, 1])
-
-        #     # Revenus annuels
-        #     with col1:
-        #         revenus_annuels_tmi = st.number_input(
-        #             "Vos revenus annuels (€)",
-        #             min_value=0.0,
-        #             value=45000.0,
-        #             step=1000.0,
-        #             key="ic_revenus_tmi",
-        #         )
-
-        #     # Situation familiale
-        #     with col2:
-        #         situation_familiale_ic = st.selectbox(
-        #             "Situation familiale",
-        #             [
-        #                 "Célibataire",
-        #                 "Marié(e)/Pacsé(e)",
-        #                 "Couple + 1 enfant",
-        #                 "Couple + 2 enfants",
-        #                 "Couple + 3 enfants",
-        #             ],
-        #             key="ic_situation",
-        #         )
-
-        #         parts_fiscales_ic = {
-        #             "Célibataire": 1,
-        #             "Marié(e)/Pacsé(e)": 2,
-        #             "Couple + 1 enfant": 2.5,
-        #             "Couple + 2 enfants": 3,
-        #             "Couple + 3 enfants": 4,
-        #         }
-
-        #         nb_parts_ic = parts_fiscales_ic[situation_familiale_ic]
-
-        #     # Calcul TMI + Stratégie
-        #     with col3:
-        #         tmi_personnelle = calculer_tmi_simplifiee(revenus_annuels_tmi, nb_parts_ic)
-        #         st.metric("Votre TMI", f"{tmi_personnelle}%")
-
-        #         optimisation_type = st.selectbox(
-        #             "Stratégie d'optimisation",
-        #             [
-        #                 "Plus-values mobilières",
-        #                 "Intérêts (livrets/obligations)",
-        #                 "Dividendes",
-        #             ],
-        #             key="ic_optimisation_type",
-        #             help="Type de revenus générés par votre placement",
-        #         )
-
-        # Mapping des fréquences
-        freq_versement_map = {
-            "Mensuel": 12,
-            "Trimestriel": 4,
-            "Semestriel": 2,
-            "Annuel": 1,
-        }
-        freq_capitalisation_map = {
-            "Mensuelle": 12,
-            "Trimestrielle": 4,
-            "Semestrielle": 2,
-            "Annuelle": 1,
-            "Continue": float("inf"),
-        }
+    # Mapping des fréquences
+    freq_versement_map = {
+        "Mensuel": 12,
+        "Trimestriel": 4,
+        "Semestriel": 2,
+        "Annuel": 1,
+    }
+    freq_capitalisation_map = {
+        "Mensuelle": 12,
+        "Trimestrielle": 4,
+        "Semestrielle": 2,
+        "Annuelle": 1,
+        "Continue": float("inf"),
+    }
 
     m = freq_versement_map[frequence_versement]  # Fréquence des versements
     n = freq_capitalisation_map[frequence_capitalisation]  # Fréquence de capitalisation
@@ -362,9 +437,11 @@ with tab1:
     # Application de l'impôt sur les intérêts uniquement
     if calcul_apres_impot and interets_bruts > 0:
         # Calcul des abattements selon le type de placement
+        abattement_applique = 0
         if type_placement == "Assurance-vie" and duree_annees >= 8:
             # Abattement de 4 600€ pour une personne seule
-            interets_imposables = max(0, interets_bruts - 4600)
+            abattement_applique = 4600
+            interets_imposables = max(0, interets_bruts - abattement_applique)
         else:
             interets_imposables = interets_bruts
 
@@ -375,6 +452,8 @@ with tab1:
         valeur_finale_nette = valeur_finale_brute
         interets_nets = interets_bruts
         impots_sur_interets = 0
+        abattement_applique = 0
+        interets_imposables = interets_bruts
 
     # Ajustement inflation (sur la valeur finale)
     if ajuster_inflation:
@@ -432,6 +511,7 @@ with tab1:
         st.info(
             f"📝 Pour un investissement de {versement_periodique:.1f} € {affichage_frequence} sur {duree_annees} ans avec un rendement de {taux_annuel} % par an."
         )
+
     col1, col2, col3, col4 = st.columns(4)
     with col1:
         st.metric("💼 Total versé", f"{total_verse:,.2f} €")
@@ -458,21 +538,54 @@ with tab1:
             st.metric(
                 "🛒 Pouvoir d'achat final",
                 f"{pouvoir_achat_final:,.2f} €",
-                # (
-                #     f"-{(perte_pouvoir_achat/valeur_finale_nette)*100:.1f}%"
-                #     if valeur_finale_nette > 0
-                #     else "0%"
-                # ),
             )
-            # st.metric(
-            #     "📉 Rendement réel annualisé",
-            #     f"{rendement_reel_annuel:.2f} %",
-            # )
         elif calcul_apres_impot and impots_sur_interets > 0:
             st.metric(
                 "💸 Impôts payés",
                 f"{impots_sur_interets:,.2f} €",
                 f"{taux_imposition:.1f}%",
+            )
+
+    # Comparaison PFU vs TMI si optimisation activée
+    if calcul_apres_impot and optimisation_fiscale:
+        st.subheader("⚖️ Comparaison PFU vs Barème progressif (TMI)")
+
+        # Calcul avec PFU standard
+        taux_pfu = calculer_taux_imposition_effectif(
+            type_placement, duree_annees, "Standard", None, False
+        )
+
+        if type_placement == "Assurance-vie" and duree_annees >= 8:
+            interets_imposables_pfu = max(0, interets_bruts - 4600)
+        else:
+            interets_imposables_pfu = interets_bruts
+
+        impots_pfu = interets_imposables_pfu * (taux_pfu / 100)
+        valeur_finale_pfu = total_verse + (interets_bruts - impots_pfu)
+
+        # Comparaison
+        gain_optimisation = valeur_finale_nette - valeur_finale_pfu
+
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            st.metric(
+                "💰 PFU Standard",
+                f"{valeur_finale_pfu:,.2f} €",
+                f"Impôt: {impots_pfu:,.2f} € ({taux_pfu:.1f}%)",
+            )
+        with col2:
+            st.metric(
+                "🎯 Avec votre TMI",
+                f"{valeur_finale_nette:,.2f} €",
+                f"Impôt: {impots_sur_interets:,.2f} € ({taux_imposition:.1f}%)",
+            )
+        with col3:
+            couleur_gain = "normal" if gain_optimisation >= 0 else "inverse"
+            st.metric(
+                "📊 Gain d'optimisation",
+                f"{gain_optimisation:+,.2f} €",
+                f"{(gain_optimisation/valeur_finale_pfu)*100:+.2f}%",
+                delta_color=couleur_gain,
             )
 
     # Comparaison des fréquences de capitalisation
@@ -543,18 +656,31 @@ with tab1:
 
         with col1:
             if calcul_apres_impot:
+                # Calcul optimisé pour l'abattement annuel
+                if abattement_applique > 0:
+                    annees_abattement = math.ceil(interets_bruts / abattement_applique)
+                    conseil_abattement = f"Pour optimiser votre imposition, vous devriez retirer {abattement_applique:,.0f}€/an sur {annees_abattement} ans."
+                else:
+                    conseil_abattement = ""
 
-                annees_abattement = math.ceil(interets_bruts / 4600)
+                # Information sur le type de revenus si TMI utilisée
+                info_revenus = ""
+                if optimisation_fiscale:
+                    info_revenus = f"- Type de revenus : {type_revenus_utilise}\n"
+                    if "tmi_personnelle" in locals():
+                        info_revenus += f"- Votre TMI : {tmi_personnelle}%\n"
+
                 st.info(
                     f"""
                 **Fiscalité {type_placement} :**
-                - Intérêts bruts : {interets_bruts:,.2f} €
+                {info_revenus}- Intérêts bruts : {interets_bruts:,.2f} €
+                {"- Abattement appliqué : {:,.0f} €".format(abattement_applique) if abattement_applique > 0 else ""}
+                - Intérêts imposables : {interets_imposables:,.2f} €
                 - Taux d'imposition : {taux_imposition:.1f}%
-                {"- Abattement appliqué : 4 600 €" if type_placement == "Assurance-vie" and duree_annees >= 8 else ""}
                 - Impôts : {impots_sur_interets:,.2f} €
                 - **Intérêts nets : {interets_nets:,.2f} €**
 
-                Pour optimiser votre imposition, vous devriez retirer 4600€/an sur {annees_abattement} ans.
+                {conseil_abattement}
                 """
                 )
 
