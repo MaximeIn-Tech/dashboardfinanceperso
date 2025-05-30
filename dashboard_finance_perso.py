@@ -571,20 +571,20 @@ with tab1:
             st.metric(
                 "💰 PFU Standard",
                 f"{valeur_finale_pfu:,.2f} €",
-                f"Impôt: {impots_pfu:,.2f} € ({taux_pfu:.1f}%)",
+                # f"Impôt: {impots_pfu:,.2f} € ({taux_pfu:.1f}%)",
             )
         with col2:
             st.metric(
                 "🎯 Avec votre TMI",
                 f"{valeur_finale_nette:,.2f} €",
-                f"Impôt: {impots_sur_interets:,.2f} € ({taux_imposition:.1f}%)",
+                # f"Impôt: {impots_sur_interets:,.2f} € ({taux_imposition:.1f}%)",
             )
         with col3:
             couleur_gain = "normal" if gain_optimisation >= 0 else "inverse"
             st.metric(
                 "📊 Gain d'optimisation",
                 f"{gain_optimisation:+,.2f} €",
-                f"{(gain_optimisation/valeur_finale_pfu)*100:+.2f}%",
+                # f"{(gain_optimisation/valeur_finale_pfu)*100:+.2f}%",
                 delta_color=couleur_gain,
             )
 
