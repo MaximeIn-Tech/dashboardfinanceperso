@@ -941,17 +941,33 @@ with tab2:
     # Métriques FIRE
     col1, col2, col3, col4 = st.columns(4)
     with col1:
-        st.metric("💰 Nombre FIRE", f"{format_nombre(nombre_fire)} €")
+        st.metric(
+            "💰 Nombre FIRE",
+            f"{format_nombre(nombre_fire)} €",
+            help="Votre capital investi pour pouvoir être FI/RE.",
+        )
     with col2:
-        st.metric("📊 Taux d'épargne", f"{taux_epargne:.1f}%")
+        st.metric(
+            "📊 Taux d'épargne",
+            f"{taux_epargne:.1f}%",
+            help="Votre capacité/taux d'épargne accessible.",
+        )
     with col3:
         if annees_fire < 100:
-            st.metric("⏰ Années jusqu'à FIRE", f"{annees_fire:.1f} ans")
+            st.metric(
+                "⏰ Années jusqu'à FIRE",
+                f"{annees_fire:.1f} ans",
+                help="Le nombre d'années qu'il vous reste pour être FI/RE.",
+            )
         else:
             st.metric("⏰ Années jusqu'à FIRE", "Impossible")
     with col4:
         if annees_fire < 100:
-            st.metric("🎂 Âge FIRE", f"{age_fire:.0f} ans")
+            st.metric(
+                "🎂 Âge FIRE",
+                f"{age_fire:.0f} ans",
+                help="Votre âge quand vous pourrez être FI/RE.",
+            )
         else:
             st.metric("🎂 Âge FIRE", "N/A")
 
