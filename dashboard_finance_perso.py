@@ -8,6 +8,11 @@ import streamlit as st
 
 from components.footer import render_footer
 
+
+def format_nombre(n):
+    return f"{n:,.0f}".replace(",", " ")
+
+
 # Configuration de la page
 st.set_page_config(page_title="Calculateurs Financiers", page_icon="💰", layout="wide")
 
@@ -973,9 +978,9 @@ with tab2:
         st.info(
             f"""
         **Votre situation FIRE :**
-        - Épargne mensuelle : {epargne_annuelle/12:,.0f} €
-        - Revenus passifs nécessaires : {depenses_annuelles:,.0f} €/an
-        - Patrimoine manquant : {max(0, nombre_fire - patrimoine_actuel):,.0f} €
+        - Épargne mensuelle : {format_nombre(epargne_annuelle/12)} €
+        - Revenus passifs nécessaires : {format_nombre(depenses_annuelles)} €/an
+        - Patrimoine manquant : {format_nombre(max(0, nombre_fire - patrimoine_actuel))} €
         """
         )
 
