@@ -854,6 +854,7 @@ with tab2:
             min_value=0.0,
             value=40000.0,
             step=1000.0,
+            format="%.0f",
             key="fire_revenus",
         )
 
@@ -862,6 +863,7 @@ with tab2:
             min_value=0.0,
             value=25000.0,
             step=1000.0,
+            format="%.0f",
             key="fire_depenses",
         )
 
@@ -871,6 +873,7 @@ with tab2:
             min_value=0.0,
             value=10000.0,
             step=1000.0,
+            format="%.0f",
             key="fire_patrimoine",
         )
 
@@ -1028,6 +1031,7 @@ with tab3:
             min_value=0.0,
             value=45000.0,
             step=1000.0,
+            format="%.0f",
             key="tmi_revenus",
         )
 
