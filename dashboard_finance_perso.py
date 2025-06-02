@@ -8,6 +8,11 @@ import streamlit as st
 
 from components.footer import render_footer
 
+
+def format_number(n):
+    return "{:,.0f}".format(n).replace(",", " ")
+
+
 # Configuration de la page
 st.set_page_config(page_title="Calculateurs Financiers", page_icon="💰", layout="wide")
 
@@ -38,12 +43,12 @@ with tab1:
 
     with col1:
         st.subheader("💶 Capital et versements")
-        capital_initial = st.number_input(
+
+        capital_initial = st.text_input(
             "Capital initial (€)",
-            min_value=0.0,
-            value=0.0,
-            step=100.0,
-            key="ic_capital",
+            value="0",
+            key="ic_capital_input",
+            help="Entrez un montant en euros sans symbole. Exemple : 10 000",
         )
 
         versement_periodique = st.number_input(
