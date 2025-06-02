@@ -37,7 +37,7 @@ def render_footer():
             <a href="https://github.com/MaximeIn-Tech" target="_blank">
                 <img src="https://cdn-icons-png.flaticon.com/512/733/733553.png" alt="GitHub">
             </a>
-            <a href="https://www.linkedin.com/in/tonprofil" target="_blank">
+            <a href="https://www.linkedin.com/in/maximehamou" target="_blank">
                 <img src="https://cdn-icons-png.flaticon.com/512/174/174857.png" alt="LinkedIn">
             </a>
         </div>
