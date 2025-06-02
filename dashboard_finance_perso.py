@@ -6,6 +6,8 @@ import plotly.express as px
 import plotly.graph_objects as go
 import streamlit as st
 
+from components.footer import render_footer
+
 # Configuration de la page
 st.set_page_config(page_title="Calculateurs Financiers", page_icon="💰", layout="wide")
 
@@ -1305,10 +1307,4 @@ with tab3:
     for conseil in conseils:
         st.info(conseil)
 
-st.markdown("---")
-st.markdown(
-    "💡 **Conseil** : Ces calculateurs sont à titre indicatif. Les rendements passés ne garantissent pas les performances futures."
-)
-st.markdown(
-    "❤️ Ce site a été créé avec amour par [Maxime in tech](https://github.com/MaximeIn-Tech) !"
-)
+render_footer()
