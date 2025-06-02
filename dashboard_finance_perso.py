@@ -8,11 +8,6 @@ import streamlit as st
 
 from components.footer import render_footer
 
-
-def format_number(n):
-    return "{:,.0f}".format(n).replace(",", " ")
-
-
 # Configuration de la page
 st.set_page_config(page_title="Calculateurs Financiers", page_icon="💰", layout="wide")
 
@@ -42,21 +37,27 @@ with tab1:
     col1, col2 = st.columns(2)
 
     with col1:
-        st.subheader("💶 Capital et versements")
+        st.markdown("## 💶 Capital et versements")
+        st.caption("🔧 Paramétrez votre simulation d’investissement ci-dessous.")
 
-        capital_initial = st.text_input(
+        st.markdown("### 🧾 Capital de départ")
+        capital_initial = st.number_input(
             "Capital initial (€)",
-            value="0",
-            key="ic_capital_input",
-            help="Entrez un montant en euros sans symbole. Exemple : 10 000",
+            min_value=0.0,
+            value=0.0,
+            step=100.0,
+            key="ic_capital",
+            format="%.0f",
         )
 
+        st.markdown("### 🔁 Versements réguliers")
         versement_periodique = st.number_input(
             "Versement périodique (€)",
             min_value=0.0,
             value=100.0,
             step=10.0,
             key="ic_versement",
+            format="%.0f",
         )
 
         frequence_versement = st.selectbox(
@@ -65,6 +66,7 @@ with tab1:
             key="ic_freq_versement",
         )
 
+        st.markdown("### 📈 Paramètres de croissance")
         taux_annuel = st.number_input(
             "Taux d'intérêt annuel (%)",
             min_value=0.0,
@@ -72,10 +74,11 @@ with tab1:
             value=5.0,
             step=0.1,
             key="ic_taux",
+            format="%.1f",
         )
 
         duree_annees = st.number_input(
-            "Durée (années)",
+            "Durée de placement (années)",
             min_value=1,
             max_value=50,
             value=10,
