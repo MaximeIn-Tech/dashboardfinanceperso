@@ -31,7 +31,7 @@ st.markdown("---")
 
 # Création des onglets
 tab1, tab2, tab3 = st.tabs(
-    ["🏦 Intérêts Composés", "🔥 Calculateur FIRE", "🧮 Calculateur d'Impôts"]
+    ["🏦 Intérêts Composés", "🔥 Calculateur FI/RE", "🧮 Calculateur d'Impôts"]
 )
 
 # ============= ONGLET 1: INTÉRÊTS COMPOSÉS =============
@@ -849,7 +849,7 @@ with tab1:
 
 # ============= ONGLET 2: CALCULATEUR FIRE =============
 with tab2:
-    st.header("🔥 Calculateur FIRE (Financial Independence, Retire Early)")
+    st.header("🔥 Calculateur FI/RE (Financial Independence, Retire Early)")
 
     col1, col2, col3 = st.columns(3)
 
