@@ -941,7 +941,7 @@ with tab2:
     # Métriques FIRE
     col1, col2, col3, col4 = st.columns(4)
     with col1:
-        st.metric("💰 Nombre FIRE", f"{nombre_fire:,.0f} €")
+        st.metric("💰 Nombre FIRE", f"{format_nombre(nombre_fire)} €")
     with col2:
         st.metric("📊 Taux d'épargne", f"{taux_epargne:.1f}%")
     with col3:
