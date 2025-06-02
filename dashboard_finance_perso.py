@@ -1166,7 +1166,7 @@ with tab3:
     col1, col2, col3, col4 = st.columns(4)
 
     with col1:
-        st.metric("💼 Revenus bruts", f"{revenus_imposables:,.0f} €")
+        st.metric("💼 Revenus bruts", f"{format_nombre(revenus_imposables)} €")
 
     with col2:
         st.metric(
