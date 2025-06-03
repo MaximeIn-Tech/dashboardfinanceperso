@@ -1653,27 +1653,6 @@ with tab4:
                 name="💼 Portefeuille Locataire",
                 line=dict(color="#ff7f0e", width=3),
                 marker=dict(size=6),
-                fill="tonexty",  # Remplit entre cette trace et la précédente
-                fillcolor="rgba(255, 127, 14, 0.2)",  # Orange clair transparent
-            )
-        )
-
-        # Pour rendre la zone verte quand acheteur est au-dessus
-        # On ajoute une trace invisible remplissant la zone en dessous de l'acheteur
-        fig.add_trace(
-            go.Scatter(
-                x=pd.concat([df["Année"], df["Année"][::-1]]),
-                y=pd.concat(
-                    [
-                        df["Valeur Nette Acheteur (€)"],
-                        df["Portefeuille Locataire (€)"][::-1],
-                    ]
-                ),
-                fill="toself",
-                fillcolor="rgba(44, 160, 44, 0.2)",  # Vert clair transparent
-                line=dict(color="rgba(255,255,255,0)"),
-                hoverinfo="skip",
-                showlegend=False,
             )
         )
 
@@ -1706,9 +1685,6 @@ with tab4:
         )
 
         st.plotly_chart(fig, use_container_width=True)
-
-        with st.expander("Tableau comparatif", expanded=False):
-            st.dataframe(df, use_container_width=True, hide_index=True)
 
         st.info(
             """
