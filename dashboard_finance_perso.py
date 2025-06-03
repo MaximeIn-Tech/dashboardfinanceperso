@@ -1382,11 +1382,12 @@ with tab3:
             --background-color: #FFFFFF;
             --secondary-background-color: #f0f2f6;
             --primary-color: #FF4B4B;
-            --text-color: #31333F;
+            --text-color: #FFFFFF;
             --text-muted-color: rgba(30, 30, 30, 0.6);
             --border-color: rgba(0, 0, 0, 0.1);
         }
     }
+
 
     .conseil-card {
         background: var(--secondary-background-color);
@@ -1433,33 +1434,34 @@ with tab3:
 
     .conseil-title {
         margin: 0;
-        color: var(--text-color);
+        color: #FAFAFA !important;
         font-size: 16px;
         font-weight: 600;
     }
 
     .conseil-title-compact {
         margin: 0;
-        color: var(--text-color);
+        color: #FAFAFA !important;
         font-size: 14px;
         font-weight: 600;
     }
 
     .conseil-description {
-        color: var(--text-muted-color);
+        color: #FAFAFA !important;
         margin: 8px 0;
         line-height: 1.4;
     }
 
     .conseil-description-compact {
-        color: var(--text-muted-color);
+        color: #FAFAFA !important;
         margin: 5px 0;
-        font-size: 16px;
+        font-size: 18px !important;
         line-height: 1.3;
         flex-grow: 1;
     }
 
     .conseil-avantage {
+        color: #FAFAFA !important;
         border-radius: 8px;
         padding: 10px 12px;
         margin-top: 12px;
@@ -1467,30 +1469,8 @@ with tab3:
         font-size: 13px;
     }
 
-    .note-finale {
-    background: var(--secondary-background-color, #f2f2f2);
-    border: 1px solid var(--primary-color, #FF4B4B);
-    border-radius: 12px;
-    padding: 20px;
-    margin: 30px 0;
-    text-align: center;
-    }
-
-    .note-titre {
-        color: var(--text-muted-color, #333333);
-        margin-bottom: 10px;
-        font-size: 16px;
-        font-weight: 600;
-    }
-
-    .note-texte {
-        color: var(--text-color, #333333);
-        opacity: 0.8;
-        margin: 0;
-        font-style: italic;
-    }
-
     .conseil-avantage-compact {
+        color: #FAFAFA !important;
         border-radius: 6px;
         padding: 8px;
         margin-top: auto;
@@ -1499,7 +1479,7 @@ with tab3:
     }
 
     .conseil-categorie {
-        color: var(--text-muted-color);
+        color: #FAFAFA !important;
         font-style: italic;
         font-size: 14px;
         margin-top: 8px;

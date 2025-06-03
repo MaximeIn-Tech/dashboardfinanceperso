@@ -9,6 +9,30 @@ def render_footer():
     # Note finale avec style adaptatif
     st.markdown(
         """
+        <style>
+            .note-titre {
+            color: #FAFAFA !important; /* Couleur fixe sombre */
+            margin-bottom: 10px;
+            font-size: 50px;
+            font-weight: 600;
+        }
+
+        .note-finale {
+            background: var(--secondary-background-color);
+            border: 1px solid var(--primary-color);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 30px 0;
+            text-align: center;
+        }
+
+        .note-texte {
+            color: #FAFAFA !important;
+            margin: 0;
+            font-style: italic;
+        }
+        </style>
+
     <div class="note-finale">
         <h5 class="note-titre">
             📋 Note importante
