@@ -1493,11 +1493,9 @@ with tab4:
 
     # Calcul de la différence en pourcentage
     diff_pct = (
-        (portefeuille_acheteur_final - portefeuille_locataire_final)
-        / portefeuille_locataire_final
-        * 100
-        if portefeuille_locataire_final != 0
-        else 0
+        100
+        * (portefeuille_locataire_final - portefeuille_acheteur_final)
+        / portefeuille_acheteur_final
     )
 
     st.subheader("📊 Comparaison finale")
