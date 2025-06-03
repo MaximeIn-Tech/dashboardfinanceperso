@@ -17,44 +17,44 @@ def render_footer():
         border_color = "#2196f3"
         text_color = "#1976d2"
 
-        # Note finale avec style adaptatif
-        st.markdown(
-            """<style>
-                .note-finale {
-        background: var(--secondary-background-color);
-        border: 1px solid var(--primary-color);
-        border-radius: 12px;
-        padding: 20px;
-        margin: 30px 0;
-        text-align: center;
-    }
+    # ✅ Note finale toujours affichée, avec couleurs dynamiques
+    st.markdown(
+        f"""
+        <style>
+            .note-finale {{
+                background: {bg_color};
+                border: 1px solid {border_color};
+                border-radius: 12px;
+                padding: 20px;
+                margin: 30px 0;
+                text-align: center;
+            }}
 
-    .note-titre {
-        color: rgba(250, 250, 250, 0.8);
-        margin-bottom: 10px;
-        font-size: 16px;
-        font-weight: 600;
-    }
+            .note-titre {{
+                color: {text_color};
+                margin-bottom: 10px;
+                font-size: 16px;
+                font-weight: 600;
+            }}
 
-    .note-texte {
-        color: rgba(250, 250, 250, 0.8);
-        margin: 0;
-        font-style: italic;
-    }</style>
+            .note-texte {{
+                color: {text_color};
+                margin: 0;
+                font-style: italic;
+            }}
+        </style>
         <div class="note-finale">
-            <h5 class="note-titre">
-                📋 Note importante
-            </h5>
+            <h5 class="note-titre">📋 Note importante</h5>
             <p class="note-texte">
                 Ces conseils sont donnés à titre indicatif.
                 Consultez un conseiller fiscal pour une stratégie personnalisée.
             </p>
         </div>
         """,
-            unsafe_allow_html=True,
-        )
+        unsafe_allow_html=True,
+    )
 
-    # Footer HTML avec logos
+    # ✅ Footer HTML
     st.markdown(
         """
         <style>
