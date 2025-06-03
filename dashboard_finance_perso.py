@@ -1631,6 +1631,8 @@ with st.container():
             y=df["Portefeuille Locataire (€)"],
             mode="lines+markers",
             name="💼 Portefeuille Locataire",
+            line=dict(color="blue", width=3),
+            marker=dict(size=6),
         )
     )
     fig.add_trace(
@@ -1639,9 +1641,10 @@ with st.container():
             y=df["Valeur Nette Acheteur (€)"],
             mode="lines+markers",
             name="🏡 Valeur Nette Acheteur",
+            line=dict(color="green", width=3),
+            marker=dict(size=6),
         )
     )
-
     if annee_croisement:
         fig.add_vline(
             x=annee_croisement, line_width=2, line_dash="dash", line_color="red"
@@ -1655,12 +1658,15 @@ with st.container():
             text=f"📍 Croisement: Année {annee_croisement}",
             showarrow=True,
             arrowhead=1,
+            bgcolor="white",
         )
     fig.update_layout(
         title="Évolution du patrimoine net - Acheter vs Louer",
         xaxis_title="Année",
         yaxis_title="Montant (€)",
         template="plotly_white",
+        hovermode="x unified",
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
     )
     st.plotly_chart(fig, use_container_width=True)
 
