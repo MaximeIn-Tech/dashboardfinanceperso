@@ -1442,36 +1442,36 @@ with tab4:
     portefeuille_loc = cout_initial_achat  # L'apport est investi
     cash_acheteur = 0
 
-    for annee in range(1, duree_projection + 1):
-        interets_annuels = mensualite_credit * 12 if annee <= duree_credit else 0
-        charges = entretien_annuel
-        valeur_bien *= 1 + croissance_immo
+for annee in range(1, duree_projection + 1):
+    interets_annuels = mensualite_credit * 12 if annee <= duree_credit else 0
+    charges = entretien_annuel
+    valeur_bien *= 1 + croissance_immo
 
-        cout_achat = interets_annuels + charges
-        cout_location = loyer * 12
+    cout_achat = interets_annuels + charges
+    cout_location = loyer * 12
 
-        # Simuler portefeuille locataire
-        surplus_annuel = interets_annuels - cout_location
-        portefeuille_loc *= 1 + rendement_portefeuille
-        portefeuille_loc += max(0, surplus_annuel)
+    # Simuler portefeuille locataire
+    surplus_annuel = interets_annuels - cout_location
+    portefeuille_loc *= 1 + rendement_portefeuille
+    portefeuille_loc += max(0, surplus_annuel)
 
-        # Simuler portefeuille acheteur
-        portefeuille_achat += max(0, cout_location - interets_annuels)
-        portefeuille_achat *= 1 + rendement_portefeuille
+    # Simuler portefeuille acheteur
+    portefeuille_achat += max(0, cout_location - interets_annuels)
+    portefeuille_achat *= 1 + rendement_portefeuille
 
-        # ➕ Appliquer la revalorisation **après** le calcul de l’année
-        loyer *= 1 + croissance_loyer
+    # ➕ Appliquer la revalorisation **après** le calcul de l’année
+    loyer *= 1 + croissance_loyer
 
-        data.append(
-            {
-                "Année": annee,
-                "Cout Achat Cumulé (€)": cout_achat * annee,
-                "Cout Location Cumulé (€)": cout_location * annee,
-                "Valeur Bien (€)": valeur_bien,
-                "Portefeuille Locataire (€)": portefeuille_loc,
-                "Portefeuille Acheteur (€)": portefeuille_achat,
-            }
-        )
+    data.append(
+        {
+            "Année": annee,
+            "Cout Achat Cumulé (€)": cout_achat * annee,
+            "Cout Location Cumulé (€)": cout_location * annee,
+            "Valeur Bien (€)": valeur_bien,
+            "Portefeuille Locataire (€)": portefeuille_loc,
+            "Portefeuille Acheteur (€)": portefeuille_achat,
+        }
+    )
 
     # Affichage
     st.subheader("📈 Comparaison visuelle")
