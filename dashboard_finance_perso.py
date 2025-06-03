@@ -1473,14 +1473,14 @@ with tab3:
     }
 
     .note-titre {
-        color: rgba(250, 250, 250, 0.8);
+        color: var(--text-color); opacity: 0.8;
         margin-bottom: 10px;
         font-size: 16px;
         font-weight: 600;
     }
 
     .note-texte {
-        color: rgba(250, 250, 250, 0.8);
+        color: var(--text-color); opacity: 0.8;
         margin: 0;
         font-style: italic;
     }
