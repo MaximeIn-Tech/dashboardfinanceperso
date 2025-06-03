@@ -1625,28 +1625,53 @@ with st.container():
             break
 
     fig = go.Figure()
-    fig.add_trace(
-        go.Scatter(
-            x=df["Année"],
-            y=df["Portefeuille Locataire (€)"],
-            mode="lines+markers",
-            name="💼 Portefeuille Locataire",
-            fill="tonexty",
-            line=dict(color="#ff7f0e", width=3),
-            marker=dict(size=6),
-        )
-    )
+
+    # Trace Acheteur
     fig.add_trace(
         go.Scatter(
             x=df["Année"],
             y=df["Valeur Nette Acheteur (€)"],
             mode="lines+markers",
             name="🏡 Valeur Nette Acheteur",
-            fill="tonexty",
-            line=dict(color="#1f77b4", width=3),
+            line=dict(color="#2ca02c", width=3),
             marker=dict(size=6),
         )
     )
+
+    # Trace Locataire
+    fig.add_trace(
+        go.Scatter(
+            x=df["Année"],
+            y=df["Portefeuille Locataire (€)"],
+            mode="lines+markers",
+            name="💼 Portefeuille Locataire",
+            line=dict(color="#ff7f0e", width=3),
+            marker=dict(size=6),
+            fill="tonexty",  # Remplit entre cette trace et la précédente
+            fillcolor="rgba(255, 127, 14, 0.2)",  # Orange clair transparent
+        )
+    )
+
+    # Pour rendre la zone verte quand acheteur est au-dessus
+    # On ajoute une trace invisible remplissant la zone en dessous de l'acheteur
+    fig.add_trace(
+        go.Scatter(
+            x=pd.concat([df["Année"], df["Année"][::-1]]),
+            y=pd.concat(
+                [
+                    df["Valeur Nette Acheteur (€)"],
+                    df["Portefeuille Locataire (€)"][::-1],
+                ]
+            ),
+            fill="toself",
+            fillcolor="rgba(44, 160, 44, 0.2)",  # Vert clair transparent
+            line=dict(color="rgba(255,255,255,0)"),
+            hoverinfo="skip",
+            showlegend=False,
+        )
+    )
+
+    # Ajouter la ligne verticale de croisement
     if annee_croisement:
         fig.add_vline(
             x=annee_croisement, line_width=2, line_dash="dash", line_color="red"
@@ -1662,6 +1687,7 @@ with st.container():
             arrowhead=1,
             bgcolor="white",
         )
+
     fig.update_layout(
         title="Évolution du patrimoine net - Acheter vs Louer",
         xaxis_title="Année",
@@ -1670,6 +1696,7 @@ with st.container():
         hovermode="x unified",
         legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
     )
+
     st.plotly_chart(fig, use_container_width=True)
 
     with st.expander("Tableau comparatif", expanded=False):
