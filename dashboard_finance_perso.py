@@ -1364,12 +1364,24 @@ with tab3:
     st.markdown(
         """
     <style>
-    /* Récupération des variables CSS de Streamlit */
-    :root {
-    --primary-color: #FF4B4B;
-    --background-color: #0E1117;
-    --secondary-background-color: #262730;
-    --text-color: #FAFAFA;
+    /* Thème sombre */
+    @media (prefers-color-scheme: dark) {
+        :root {
+            --background-color: #0E1117;
+            --secondary-background-color: #262730;
+            --primary-color: #FF4B4B;
+            --text-color: #FAFAFA;
+        }
+    }
+
+    /* Thème clair */
+    @media (prefers-color-scheme: light) {
+        :root {
+            --background-color: #FFFFFF;
+            --secondary-background-color: #f0f2f6;
+            --primary-color: #FF4B4B;
+            --text-color: #0E1117;
+        }
     }
 
     .conseil-card {
