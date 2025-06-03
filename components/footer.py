@@ -6,32 +6,21 @@ def render_footer():
     add_vertical_space(3)
     st.markdown("---")
 
-    theme_base = st.get_option("theme.base")
-
-    if theme_base == "dark":
-        bg_color = "#0E1117"
-        border_color = "#81d4fa"
-        text_color = "#FAFAFA"
-    else:
-        bg_color = "#e3f2fd"
-        border_color = "#2196f3"
-        text_color = "#F0F2F6"
-
-        # Note finale avec style adaptatif
-        st.markdown(
-            """
-        <div class="note-finale">
-            <h5 class="note-titre">
-                📋 Note importante
-            </h5>
-            <p class="note-texte">
-                Ces conseils sont donnés à titre indicatif.
-                Consultez un conseiller fiscal pour une stratégie personnalisée.
-            </p>
-        </div>
-        """,
-            unsafe_allow_html=True,
-        )
+    # Note finale avec style adaptatif
+    st.markdown(
+        """
+    <div class="note-finale">
+        <h5 class="note-titre">
+            📋 Note importante
+        </h5>
+        <p class="note-texte">
+            Ces conseils sont donnés à titre indicatif.
+            Consultez un conseiller fiscal pour une stratégie personnalisée.
+        </p>
+    </div>
+    """,
+        unsafe_allow_html=True,
+    )
 
     # Footer HTML avec logos
     st.markdown(
