@@ -1443,43 +1443,33 @@ with tab4:
     cash_acheteur = 0
 
     for annee in range(1, duree_projection + 1):
+        interets_annuels = mensualite_credit * 12 if annee <= duree_credit else 0
+        charges = entretien_annuel
         valeur_bien *= 1 + croissance_immo
-        loyer *= 1 + croissance_loyer
 
+        cout_achat = interets_annuels + charges
         cout_location = loyer * 12
-        paiement_annuel_credit = mensualite_credit * 12 if annee <= duree_credit else 0
-        interets_annuels = (
-            soldes_pret[annee - 1] * taux_emprunt if annee <= duree_credit else 0
-        )
-        capital_rembourse = (
-            paiement_annuel_credit - interets_annuels if annee <= duree_credit else 0
-        )
 
-        # Locataire : investit la différence entre mensualité crédit et loyer
-        surplus_annuel = max(0, paiement_annuel_credit - cout_location)
+        # Simuler portefeuille locataire
+        surplus_annuel = interets_annuels - cout_location
         portefeuille_loc *= 1 + rendement_portefeuille
-        portefeuille_loc += surplus_annuel
+        portefeuille_loc += max(0, surplus_annuel)
 
-        # Acheteur : simule les liquidités restantes (ex. économies faites vs location)
-        epargne_equivalente = max(0, cout_location - paiement_annuel_credit)
-        cash_acheteur += epargne_equivalente
-        cash_acheteur *= 1 + rendement_portefeuille
+        # Simuler portefeuille acheteur
+        portefeuille_achat += max(0, cout_location - interets_annuels)
+        portefeuille_achat *= 1 + rendement_portefeuille
 
-        # Solde du prêt
-        solde_emprunt = soldes_pret[annee - 1] if annee <= duree_credit else 0
-        valeur_nette_acheteur = (
-            valeur_bien * (1 - frais_revente) - solde_emprunt + cash_acheteur
-        )
+        # ➕ Appliquer la revalorisation **après** le calcul de l’année
+        loyer *= 1 + croissance_loyer
 
         data.append(
             {
                 "Année": annee,
+                "Cout Achat Cumulé (€)": cout_achat * annee,
+                "Cout Location Cumulé (€)": cout_location * annee,
                 "Valeur Bien (€)": valeur_bien,
-                "Solde Emprunt (€)": solde_emprunt,
-                "Cash Acheteur (€)": cash_acheteur,
-                "Valeur Nette Acheteur (€)": valeur_nette_acheteur,
                 "Portefeuille Locataire (€)": portefeuille_loc,
-                "Loyer (€)": loyer,
+                "Portefeuille Acheteur (€)": portefeuille_achat,
             }
         )
 
