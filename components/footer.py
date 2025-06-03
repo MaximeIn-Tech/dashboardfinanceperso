@@ -17,44 +17,23 @@ def render_footer():
         border_color = "#2196f3"
         text_color = "#1976d2"
 
-    # ✅ Note finale toujours affichée, avec couleurs dynamiques
-    st.markdown(
-        f"""
-        <style>
-            .note-finale {{
-                background: {bg_color};
-                border: 1px solid {border_color};
-                border-radius: 12px;
-                padding: 20px;
-                margin: 30px 0;
-                text-align: center;
-            }}
-
-            .note-titre {{
-                color: {text_color};
-                margin-bottom: 10px;
-                font-size: 16px;
-                font-weight: 600;
-            }}
-
-            .note-texte {{
-                color: {text_color};
-                margin: 0;
-                font-style: italic;
-            }}
-        </style>
+        # Note finale avec style adaptatif
+        st.markdown(
+            """
         <div class="note-finale">
-            <h5 class="note-titre">📋 Note importante</h5>
+            <h5 class="note-titre">
+                📋 Note importante
+            </h5>
             <p class="note-texte">
                 Ces conseils sont donnés à titre indicatif.
                 Consultez un conseiller fiscal pour une stratégie personnalisée.
             </p>
         </div>
         """,
-        unsafe_allow_html=True,
-    )
+            unsafe_allow_html=True,
+        )
 
-    # ✅ Footer HTML
+    # Footer HTML avec logos
     st.markdown(
         """
         <style>
