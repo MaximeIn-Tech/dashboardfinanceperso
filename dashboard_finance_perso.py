@@ -1632,7 +1632,7 @@ with st.container():
             mode="lines+markers",
             name="💼 Portefeuille Locataire",
             fill="tonexty",
-            line=dict(color="ff7f0e", width=3),
+            line=dict(color="#ff7f0e", width=3),
             marker=dict(size=6),
         )
     )
@@ -1643,7 +1643,7 @@ with st.container():
             mode="lines+markers",
             name="🏡 Valeur Nette Acheteur",
             fill="tonexty",
-            line=dict(color="1f77b4", width=3),
+            line=dict(color="#1f77b4", width=3),
             marker=dict(size=6),
         )
     )
