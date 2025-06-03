@@ -1474,28 +1474,6 @@ with tab3:
         align-items: center;
     }
 
-    .note-finale {
-        background: var(--secondary-background-color);
-        border: 1px solid var(--primary-color);
-        border-radius: 12px;
-        padding: 20px;
-        margin: 30px 0;
-        text-align: center;
-    }
-
-    .note-titre {
-        color: rgba(250, 250, 250, 0.8);
-        margin-bottom: 10px;
-        font-size: 16px;
-        font-weight: 600;
-    }
-
-    .note-texte {
-        color: rgba(250, 250, 250, 0.8);
-        margin: 0;
-        font-style: italic;
-    }
-
     /* Couleurs spécifiques pour chaque priorité */
     .priorite-tres-elevee { color: #ff4757; }
     .priorite-elevee { color: #ff6b35; }
