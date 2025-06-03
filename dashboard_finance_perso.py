@@ -30,8 +30,13 @@ st.markdown(
 st.markdown("---")
 
 # Création des onglets
-tab1, tab2, tab3 = st.tabs(
-    ["🏦 Intérêts Composés", "🔥 Calculateur FI/RE", "🧮 Calculateur d'Impôts"]
+tab1, tab2, tab3, tab4 = st.tabs(
+    [
+        "🏦 Intérêts Composés",
+        "🔥 Calculateur FI/RE",
+        "🧮 Calculateur d'Impôts",
+        "🏠 Acheter VS Louer",
+    ]
 )
 
 # ============= ONGLET 1: INTÉRÊTS COMPOSÉS =============
@@ -1348,5 +1353,121 @@ with tab3:
 
     for conseil in conseils:
         st.info(conseil)
+
+# ============= ONGLET 4: ACHETER VS LOUER =============
+
+with tab4:
+    # Fonction de calcul des mensualités de prêt
+    def calcul_mensualite_emprunt(montant, taux_annuel, duree_annees):
+        taux_mensuel = taux_annuel / 12
+        n_mois = duree_annees * 12
+        if taux_mensuel == 0:
+            return montant / n_mois
+        mensualite = montant * taux_mensuel / (1 - (1 + taux_mensuel) ** -n_mois)
+        return mensualite
+
+    # Entrées utilisateur
+    st.title("🏠 Simulateur Acheter vs Louer")
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+        prix_bien = st.number_input(
+            "Prix du bien (€)", 100000, 2000000, 300000, step=10000
+        )
+        apport = st.number_input("Apport initial (€)", 0, 1000000, 50000, step=5000)
+        taux_emprunt = st.slider("Taux emprunt (%)", 0.0, 10.0, 2.5, step=0.1) / 100
+        duree_credit = st.slider("Durée du crédit (ans)", 5, 30, 20)
+        frais_notaire = st.slider("Frais d'achat (%)", 0.0, 10.0, 7.5, step=0.1) / 100
+        entretien_annuel = st.number_input(
+            "Frais annuels (entretien, taxes, etc.) (€)", 0, 10000, 2000
+        )
+        croissance_immo = (
+            st.slider("Croissance du marché immobilier (%)", -5.0, 10.0, 1.5, step=0.1)
+            / 100
+        )
+
+    with col2:
+        loyer_initial = st.number_input("Loyer mensuel (€)", 300, 5000, 1000, step=50)
+        croissance_loyer = (
+            st.slider("Croissance annuelle du loyer (%)", 0.0, 5.0, 1.5, step=0.1) / 100
+        )
+        rendement_portefeuille = (
+            st.slider("Rendement des investissements (%)", 0.0, 10.0, 5.0, step=0.1)
+            / 100
+        )
+        duree_projection = st.slider("Durée de la projection (années)", 5, 40, 20)
+
+    # Calculs initiaux
+    montant_emprunte = prix_bien - apport
+    mensualite_credit = calcul_mensualite_emprunt(
+        montant_emprunte, taux_emprunt, duree_credit
+    )
+    cout_initial_achat = apport + prix_bien * frais_notaire
+
+    # Simulation année par année
+    data = []
+    loyer = loyer_initial
+    valeur_bien = prix_bien
+    portefeuille_loc = cout_initial_achat  # L'apport est investi
+    portefeuille_achat = 0
+
+    for annee in range(1, duree_projection + 1):
+        interets_annuels = mensualite_credit * 12 if annee <= duree_credit else 0
+        charges = entretien_annuel
+        valeur_bien *= 1 + croissance_immo
+
+        cout_achat = interets_annuels + charges
+        cout_location = loyer * 12
+
+        # Simuler portefeuille locataire
+        surplus_annuel = (
+            interets_annuels - cout_location
+        )  # Ce qu'il peut investir en plus
+        portefeuille_loc *= 1 + rendement_portefeuille
+        portefeuille_loc += max(0, surplus_annuel)
+
+        # Simuler portefeuille acheteur (éventuellement à creuser)
+        portefeuille_achat += max(0, cout_location - interets_annuels)
+        portefeuille_achat *= 1 + rendement_portefeuille
+
+        loyer *= 1 + croissance_loyer
+
+        data.append(
+            {
+                "Année": annee,
+                "Cout Achat Cumulé (€)": cout_achat * annee,
+                "Cout Location Cumulé (€)": cout_location * annee,
+                "Valeur Bien (€)": valeur_bien,
+                "Portefeuille Locataire (€)": portefeuille_loc,
+                "Portefeuille Acheteur (€)": portefeuille_achat,
+            }
+        )
+
+    # Affichage
+    st.subheader("📈 Résultats")
+    df = pd.DataFrame(data)
+    st.line_chart(
+        df.set_index("Année")[
+            [
+                "Cout Achat Cumulé (€)",
+                "Cout Location Cumulé (€)",
+                "Portefeuille Locataire (€)",
+                "Valeur Bien (€)",
+            ]
+        ]
+    )
+
+    st.dataframe(df, use_container_width=True)
+
+    st.markdown(
+        """
+    **💡 Interprétation :**
+    - Le coût cumulé est l'argent "sorti de ta poche" dans chaque scénario.
+    - Le portefeuille locataire est basé sur l'investissement de l'apport et des mensualités économisées.
+    - Le bien acheté prend de la valeur avec le temps, mais a un coût d'entretien.
+    """
+    )
+
 
 render_footer()
