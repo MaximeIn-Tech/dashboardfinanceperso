@@ -1088,6 +1088,15 @@ with tab3:
         annee_fiscale = st.selectbox("Année fiscale", [2024, 2023], key="tmi_annee")
 
         st.info(f"📊 Nombre de parts fiscales : {nb_parts}")
+        st.info(
+            f"📉 Abattement de 10% appliqué : {abattement_10:,.0f} €\n\n"
+            f"Revenus imposables après abattement : {revenus_abattus:,.0f} €"
+        )
+
+    # Application de l'abattement de 10 % sur les revenus (plafonné à 13 522 € pour 2024)
+    plafond_abattement = 13522 if annee_fiscale == 2024 else 12912
+    abattement_10 = min(revenus_imposables * 0.10, plafond_abattement)
+    revenus_abattus = revenus_imposables - abattement_10
 
     # Barème 2024 (revenus 2023)
     if annee_fiscale == 2024:
@@ -1108,7 +1117,7 @@ with tab3:
         ]
 
     # Calcul du quotient familial
-    quotient_familial = revenus_imposables / nb_parts
+    quotient_familial = revenus_abattus / nb_parts
 
     # Calcul de l'impôt par part
     impot_par_part = 0
@@ -1139,10 +1148,10 @@ with tab3:
     impot_net = max(0, impot_brut - decote)
 
     # Taux moyen
-    taux_moyen = (impot_net / revenus_imposables * 100) if revenus_imposables > 0 else 0
+    taux_moyen = (impot_net / revenus_abattus * 100) if revenus_abattus > 0 else 0
 
     # Revenus nets après IR
-    revenus_nets_ir = revenus_imposables - impot_net
+    revenus_nets_ir = revenus_abattus - impot_net
 
     # Calcul des cotisations sociales (estimation)
     if st.checkbox("Inclure les cotisations sociales", key="tmi_cotisations"):
