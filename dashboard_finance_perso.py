@@ -1227,55 +1227,37 @@ with tab3:
 
     # Détail des tranches
     st.subheader("📋 Détail du calcul par tranches")
-    detail_tranches = []
-    cumul_impot = 0
-    for i, (seuil_inf, seuil_sup, taux) in enumerate(tranches):
-        if quotient_familial > seuil_inf:
-            base = min(quotient_familial, seuil_sup) - seuil_inf
-            impot_tranche = base * (taux / 100)
-            cumul_impot += impot_tranche
-            if seuil_sup == float("inf"):
-                tranche_desc = f"Au-delà de {seuil_inf:,.0f} €"
-            else:
-                tranche_desc = f"De {seuil_inf:,.0f} € à {seuil_sup:,.0f} €"
-            detail_tranches.append(
-                {
-                    "Tranche": tranche_desc,
-                    "Taux": f"{taux}%",
-                    "Base (QF)": f"{base:,.0f} €",
-                    "Impôt/part": f"{impot_tranche:,.0f} €",
-                    "Impôt total": f"{impot_tranche * nb_parts:,.0f} €",
-                }
-            )
+    col1, col2 = st.columns(2)
+    with col1:
+        detail_tranches = []
+        cumul_impot = 0
+        for i, (seuil_inf, seuil_sup, taux) in enumerate(tranches):
+            if quotient_familial > seuil_inf:
+                base = min(quotient_familial, seuil_sup) - seuil_inf
+                impot_tranche = base * (taux / 100)
+                cumul_impot += impot_tranche
+                if seuil_sup == float("inf"):
+                    tranche_desc = f"Au-delà de {seuil_inf:,.0f} €"
+                else:
+                    tranche_desc = f"De {seuil_inf:,.0f} € à {seuil_sup:,.0f} €"
+                detail_tranches.append(
+                    {
+                        "Tranche": tranche_desc,
+                        "Taux": f"{taux}%",
+                        "Base (QF)": f"{base:,.0f} €",
+                        "Impôt/part": f"{impot_tranche:,.0f} €",
+                        "Impôt total": f"{impot_tranche * nb_parts:,.0f} €",
+                    }
+                )
 
-    if detail_tranches:
-        df_tranches = pd.DataFrame(detail_tranches)
-        st.dataframe(df_tranches, hide_index=True)
+        if detail_tranches:
+            df_tranches = pd.DataFrame(detail_tranches)
+            st.dataframe(df_tranches, hide_index=True)
 
-    if decote > 0:
-        st.info(f"✅ Décote appliquée : {decote:,.0f} € (impôt réduit)")
+        if decote > 0:
+            st.info(f"✅ Décote appliquée : {decote:,.0f} € (impôt réduit)")
 
     # Graphiques répartition
-    col1, col2 = st.columns(2)
-
-    with col1:
-        # Graphique camembert revenus
-        if cotisations > 0:
-            values = [revenus_nets_total, impot_net, cotisations]
-            labels = ["Revenus nets", "Impôt sur le revenu", "Cotisations sociales"]
-            colors = ["#2ca02c", "#d62728", "#ff7f0e"]
-        else:
-            values = [revenus_nets_ir, impot_net]
-            labels = ["Revenus nets", "Impôt sur le revenu"]
-            colors = ["#2ca02c", "#d62728"]
-
-        fig_pie = px.pie(
-            values=values,
-            names=labels,
-            title="Répartition des revenus",
-            color_discrete_sequence=colors,
-        )
-        st.plotly_chart(fig_pie, use_container_width=True)
 
     with col2:
         # Demi-camembert pour les tranches d'imposition
