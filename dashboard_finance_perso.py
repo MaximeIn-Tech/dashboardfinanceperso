@@ -7,14 +7,10 @@ import plotly.graph_objects as go
 import streamlit as st
 
 from components.footer import render_footer
-from components.theme_switcher import theme_switcher
 
 
 def format_nombre(n):
     return f"{n:,.0f}".replace(",", " ")
-
-
-# theme = theme_switcher()
 
 
 # Configuration de la page
@@ -1488,7 +1484,7 @@ with tab3:
     }
 
     .note-titre {
-        color: var(--text-color);
+        color: rgba(250, 250, 250, 0.8);
         margin-bottom: 10px;
         font-size: 16px;
         font-weight: 600;
