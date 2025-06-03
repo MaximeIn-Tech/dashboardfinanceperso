@@ -1,0 +1,6 @@
+[theme]
+base = "dark"
+
+
+[ui]
+hideMenu = true
