@@ -1371,6 +1371,7 @@ with tab3:
             --secondary-background-color: #262730;
             --primary-color: #FF4B4B;
             --text-color: #FAFAFA;
+            --text-muted-color: rgba(250, 250, 250, 0.8);
         }
     }
 
@@ -1381,6 +1382,7 @@ with tab3:
             --secondary-background-color: #f0f2f6;
             --primary-color: #FF4B4B;
             --text-color: #31333F;
+            --text-muted-color: rgba(30, 30, 30, 0.6); /* gris foncé mais doux */
         }
     }
 
@@ -1473,10 +1475,10 @@ with tab3:
     }
 
     .note-titre {
-        color: var(--text-color); opacity: 0.8;
-        margin-bottom: 10px;
-        font-size: 16px;
-        font-weight: 600;
+    color: var(--text-muted-color);
+    margin-bottom: 10px;
+    font-size: 16px;
+    font-weight: 600;
     }
 
     .note-texte {
