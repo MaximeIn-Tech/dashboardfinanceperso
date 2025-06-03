@@ -1181,7 +1181,7 @@ with tab3:
 
     with col1:
         st.metric(
-            "💼 Revenus annuels imposables", f"{format_nombre(revenus_imposables)} €"
+            "💼 Revenus annuels imposables", f"{format_nombre(revenus_abattus)} €"
         )
 
     with col2:
