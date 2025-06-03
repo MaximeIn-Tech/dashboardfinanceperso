@@ -1401,7 +1401,8 @@ with tab4:
         col1, col2 = st.columns(2)
 
         with col1:
-            with st.expander("🏡 Acheter", expanded=True):
+            with st.expander("", expanded=True):
+                st.markdown("#### 🏡 Acheter")
                 prix_bien = st.number_input(
                     "Prix du bien (€)",
                     100000,
@@ -1478,7 +1479,8 @@ with tab4:
                 )
 
         with col2:
-            with st.expander("🏠 Louer", expanded=True):
+            with st.expander("", expanded=True):
+                st.markdown("#### 🏠 Louer")
                 loyer_initial = st.number_input(
                     "Loyer mensuel (€)",
                     300,
