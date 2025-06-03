@@ -1122,11 +1122,19 @@ with tab3:
     # Calcul de l'impôt par part
     impot_par_part = 0
     tmi = 0
+    impot_par_tranche = []
 
-    for i, (seuil_inf, seuil_sup, taux) in enumerate(tranches):
+    for seuil_inf, seuil_sup, taux in tranches:
         if quotient_familial > seuil_inf:
             base_imposable = min(quotient_familial, seuil_sup) - seuil_inf
-            impot_par_part += base_imposable * (taux / 100)
+            impot_tranche = base_imposable * (taux / 100)
+            impot_par_part += impot_tranche
+            impot_par_tranche.append(
+                (
+                    f"{seuil_inf:,.0f} - {seuil_sup if seuil_sup != float('inf') else '∞'} €",
+                    impot_tranche * nb_parts,
+                )
+            )
             if quotient_familial > seuil_inf:
                 tmi = taux
 
@@ -1217,122 +1225,161 @@ with tab3:
             )
             st.metric("📊 Taux global", f"{taux_global:.1f}%")
 
-    # Détail des tranches
-    st.subheader("📋 Détail du calcul par tranches")
+    # # Détail des tranches
+    # st.subheader("📋 Détail du calcul par tranches")
 
-    detail_tranches = []
-    cumul_impot = 0
+    # detail_tranches = []
+    # cumul_impot = 0
 
-    for i, (seuil_inf, seuil_sup, taux) in enumerate(tranches):
-        if quotient_familial > seuil_inf:
-            base = min(quotient_familial, seuil_sup) - seuil_inf
-            impot_tranche = base * (taux / 100)
-            cumul_impot += impot_tranche
+    # for i, (seuil_inf, seuil_sup, taux) in enumerate(tranches):
+    #     if quotient_familial > seuil_inf:
+    #         base = min(quotient_familial, seuil_sup) - seuil_inf
+    #         impot_tranche = base * (taux / 100)
+    #         cumul_impot += impot_tranche
 
-            if seuil_sup == float("inf"):
-                tranche_desc = f"Au-delà de {seuil_inf:,.0f} €"
-            else:
-                tranche_desc = f"De {seuil_inf:,.0f} € à {seuil_sup:,.0f} €"
+    #         if seuil_sup == float("inf"):
+    #             tranche_desc = f"Au-delà de {seuil_inf:,.0f} €"
+    #         else:
+    #             tranche_desc = f"De {seuil_inf:,.0f} € à {seuil_sup:,.0f} €"
 
-            detail_tranches.append(
-                {
-                    "Tranche": tranche_desc,
-                    "Taux": f"{taux}%",
-                    "Base (QF)": f"{base:,.0f} €",
-                    "Impôt/part": f"{impot_tranche:,.0f} €",
-                    "Impôt total": f"{impot_tranche * nb_parts:,.0f} €",
-                }
-            )
+    #         detail_tranches.append(
+    #             {
+    #                 "Tranche": tranche_desc,
+    #                 "Taux": f"{taux}%",
+    #                 "Base (QF)": f"{base:,.0f} €",
+    #                 "Impôt/part": f"{impot_tranche:,.0f} €",
+    #                 "Impôt total": f"{impot_tranche * nb_parts:,.0f} €",
+    #             }
+    #         )
 
-    if detail_tranches:
-        df_tranches = pd.DataFrame(detail_tranches)
-        st.dataframe(df_tranches, hide_index=True)
+    # if detail_tranches:
+    #     df_tranches = pd.DataFrame(detail_tranches)
+    #     st.dataframe(df_tranches, hide_index=True)
 
-    if decote > 0:
-        st.info(f"✅ Décote appliquée : {decote:,.0f} € (impôt réduit)")
+    # if decote > 0:
+    #     st.info(f"✅ Décote appliquée : {decote:,.0f} € (impôt réduit)")
 
-    # Graphique répartition
-    col1, col2 = st.columns(2)
+    # # Graphique répartition
+    # col1, col2 = st.columns(2)
 
-    with col1:
-        # Graphique camembert
-        if cotisations > 0:
-            values = [revenus_nets_total, impot_net, cotisations]
-            labels = ["Revenus nets", "Impôt sur le revenu", "Cotisations sociales"]
-            colors = ["#2ca02c", "#d62728", "#ff7f0e"]
-        else:
-            values = [revenus_nets_ir, impot_net]
-            labels = ["Revenus nets", "Impôt sur le revenu"]
-            colors = ["#2ca02c", "#d62728"]
+    # with col1:
+    #     # Graphique camembert
+    #     if cotisations > 0:
+    #         values = [revenus_nets_total, impot_net, cotisations]
+    #         labels = ["Revenus nets", "Impôt sur le revenu", "Cotisations sociales"]
+    #         colors = ["#2ca02c", "#d62728", "#ff7f0e"]
+    #     else:
+    #         values = [revenus_nets_ir, impot_net]
+    #         labels = ["Revenus nets", "Impôt sur le revenu"]
+    #         colors = ["#2ca02c", "#d62728"]
 
-        fig_pie = px.pie(
-            values=values,
-            names=labels,
-            title="Répartition des revenus",
-            color_discrete_sequence=colors,
-        )
-        st.plotly_chart(fig_pie, use_container_width=True)
+    #     fig_pie = px.pie(
+    #         values=values,
+    #         names=labels,
+    #         title="Répartition des revenus",
+    #         color_discrete_sequence=colors,
+    #     )
+    #     st.plotly_chart(fig_pie, use_container_width=True)
 
-    with col2:
-        # Simulation d'augmentation
-        st.subheader("🔮 Impact d'une augmentation")
-        augmentation = st.slider(
-            "Augmentation de salaire (€)",
-            min_value=0,
-            max_value=10000,
-            value=1000,
-            step=100,
-            key="tmi_augmentation",
-        )
+    # with col2:
+    #     # Simulation d'augmentation
+    #     st.subheader("🔮 Impact d'une augmentation")
+    #     augmentation = st.slider(
+    #         "Augmentation de salaire (€)",
+    #         min_value=0,
+    #         max_value=10000,
+    #         value=1000,
+    #         step=100,
+    #         key="tmi_augmentation",
+    #     )
 
-        if augmentation > 0:
-            nouveaux_revenus = revenus_imposables + augmentation
-            nouveau_quotient = nouveaux_revenus / nb_parts
+    #     if augmentation > 0:
+    #         nouveaux_revenus = revenus_imposables + augmentation
+    #         nouveau_quotient = nouveaux_revenus / nb_parts
 
-            # Recalcul rapide
-            nouvel_impot_par_part = 0
-            nouvelle_tmi = 0
+    #         # Recalcul rapide
+    #         nouvel_impot_par_part = 0
+    #         nouvelle_tmi = 0
 
-            for seuil_inf, seuil_sup, taux in tranches:
-                if nouveau_quotient > seuil_inf:
-                    base_imposable = min(nouveau_quotient, seuil_sup) - seuil_inf
-                    nouvel_impot_par_part += base_imposable * (taux / 100)
-                    if nouveau_quotient > seuil_inf:
-                        nouvelle_tmi = taux
+    #         for seuil_inf, seuil_sup, taux in tranches:
+    #             if nouveau_quotient > seuil_inf:
+    #                 base_imposable = min(nouveau_quotient, seuil_sup) - seuil_inf
+    #                 nouvel_impot_par_part += base_imposable * (taux / 100)
+    #                 if nouveau_quotient > seuil_inf:
+    #                     nouvelle_tmi = taux
 
-            nouvel_impot_brut = nouvel_impot_par_part * nb_parts
+    #         nouvel_impot_brut = nouvel_impot_par_part * nb_parts
 
-            # Nouvelle décote
-            nouvelle_decote = 0
-            if nouvel_impot_brut < seuil_decote:
-                nouvelle_decote = min(
-                    nouvel_impot_brut, (seuil_decote - nouvel_impot_brut) * 0.45
-                )
+    #         # Nouvelle décote
+    #         nouvelle_decote = 0
+    #         if nouvel_impot_brut < seuil_decote:
+    #             nouvelle_decote = min(
+    #                 nouvel_impot_brut, (seuil_decote - nouvel_impot_brut) * 0.45
+    #             )
 
-            nouvel_impot_net = max(0, nouvel_impot_brut - nouvelle_decote)
+    #         nouvel_impot_net = max(0, nouvel_impot_brut - nouvelle_decote)
 
-            augmentation_impot = nouvel_impot_net - impot_net
-            augmentation_nette = augmentation - augmentation_impot
+    #         augmentation_impot = nouvel_impot_net - impot_net
+    #         augmentation_nette = augmentation - augmentation_impot
 
-            if cotisations > 0:
-                nouvelles_cotisations = nouveaux_revenus * cotisations_rate
-                augmentation_cotisations = nouvelles_cotisations - cotisations
-                augmentation_nette -= augmentation_cotisations
-                taux_prelevement = (
-                    (augmentation_impot + augmentation_cotisations) / augmentation * 100
-                )
-            else:
-                taux_prelevement = augmentation_impot / augmentation * 100
+    #         if cotisations > 0:
+    #             nouvelles_cotisations = nouveaux_revenus * cotisations_rate
+    #             augmentation_cotisations = nouvelles_cotisations - cotisations
+    #             augmentation_nette -= augmentation_cotisations
+    #             taux_prelevement = (
+    #                 (augmentation_impot + augmentation_cotisations) / augmentation * 100
+    #             )
+    #         else:
+    #             taux_prelevement = augmentation_impot / augmentation * 100
 
-            st.info(
-                f"""
-            **Pour +{augmentation:,.0f} € bruts :**
-            - Nouvel impôt : +{augmentation_impot:,.0f} €
-            {"- Nouvelles cotisations : +" + f"{augmentation_cotisations:,.0f}" + " €" if cotisations > 0 else ""}
-            - **Gain net : +{augmentation_nette:,.0f} €**
-            - **Taux de prélèvement : {taux_prelevement:.1f}%**
-            """
-            )
+    #         st.info(
+    #             f"""
+    #         **Pour +{augmentation:,.0f} € bruts :**
+    #         - Nouvel impôt : +{augmentation_impot:,.0f} €
+    #         {"- Nouvelles cotisations : +" + f"{augmentation_cotisations:,.0f}" + " €" if cotisations > 0 else ""}
+    #         - **Gain net : +{augmentation_nette:,.0f} €**
+    #         - **Taux de prélèvement : {taux_prelevement:.1f}%**
+    #         """
+    #         )
+
+    # Demi camembert des impôts par tranche
+    st.subheader("📊 Répartition de l'impôt par tranches")
+
+    # On enlève les tranches où l'impôt est nul (ex: tranche à 0%)
+    impot_par_tranche_filtre = [
+        (desc, val) for desc, val in impot_par_tranche if val > 0
+    ]
+
+    labels = [desc for desc, val in impot_par_tranche_filtre]
+    values = [val for desc, val in impot_par_tranche_filtre]
+
+    fig = px.pie(
+        values=values,
+        names=labels,
+        title="Impôt par tranche",
+        color_discrete_sequence=px.colors.sequential.Reds,
+        hole=0.4,  # trou au centre, effet donut
+    )
+    # On fait un demi camembert en limitant l’angle à 180°
+    fig.update_traces(rotation=90, direction="clockwise", pull=[0] * len(values))
+    fig.update_layout(
+        showlegend=True,
+        margin=dict(t=40, b=20, l=20, r=20),
+        height=400,
+        # on masque le bas (angles 90 à 270°)
+        piecolorway=px.colors.sequential.Reds,
+    )
+    fig.update_layout(
+        annotations=[dict(text="Impôts", x=0.5, y=0.5, font_size=20, showarrow=False)]
+    )
+    fig.update_traces(textposition="inside", textinfo="percent+label")
+    # Pour limiter la visualisation au demi-cercle, on masque la moitié du graphe via layout
+    fig.update_layout(
+        margin=dict(t=40, b=40, l=40, r=40),
+        legend=dict(orientation="h", y=-0.1),
+        uniformtext_minsize=12,
+    )
+    st.plotly_chart(fig, use_container_width=True)
 
     # Conseils d'optimisation
     st.subheader("💡 Conseils d'optimisation fiscale")
