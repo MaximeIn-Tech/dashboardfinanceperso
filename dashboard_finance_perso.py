@@ -1611,7 +1611,7 @@ with st.container():
     with col3:
         st.metric(
             label="🔍 Différence Relative",
-            value="Acheteur > Locataire" if diff_pct > 0 else "Locataire > Acheteur",
+            value="Acheteur > Locataire" if diff_pct < 0 else "Locataire > Acheteur",
         )
 
     annee_croisement = None
@@ -1625,74 +1625,26 @@ with st.container():
             break
 
     fig = go.Figure()
-
-    # Traces principales
     fig.add_trace(
         go.Scatter(
             x=df["Année"],
             y=df["Portefeuille Locataire (€)"],
-            mode="lines",
+            mode="lines+markers",
             name="💼 Portefeuille Locataire",
             line=dict(color="blue", width=3),
+            marker=dict(size=6),
         )
     )
     fig.add_trace(
         go.Scatter(
             x=df["Année"],
             y=df["Valeur Nette Acheteur (€)"],
-            mode="lines",
+            mode="lines+markers",
             name="🏡 Valeur Nette Acheteur",
             line=dict(color="green", width=3),
+            marker=dict(size=6),
         )
     )
-
-    # Shade : locataire gagnant
-    fig.add_trace(
-        go.Scatter(
-            x=df["Année"].tolist() + df["Année"][::-1].tolist(),
-            y=(
-                np.maximum(
-                    df["Portefeuille Locataire (€)"], df["Valeur Nette Acheteur (€)"]
-                )
-            ).tolist()
-            + (
-                np.minimum(
-                    df["Portefeuille Locataire (€)"], df["Valeur Nette Acheteur (€)"]
-                )[::-1]
-            ).tolist(),
-            fill="toself",
-            fillcolor="rgba(0,0,255,0.1)",
-            line=dict(color="rgba(255,255,255,0)"),
-            hoverinfo="skip",
-            showlegend=True,
-            name="Zone gagnée par le locataire",
-        )
-    )
-
-    # Shade : acheteur gagnant (inversé)
-    fig.add_trace(
-        go.Scatter(
-            x=df["Année"].tolist() + df["Année"][::-1].tolist(),
-            y=(
-                np.minimum(
-                    df["Portefeuille Locataire (€)"], df["Valeur Nette Acheteur (€)"]
-                )
-            ).tolist()
-            + (
-                np.maximum(
-                    df["Portefeuille Locataire (€)"], df["Valeur Nette Acheteur (€)"]
-                )[::-1]
-            ).tolist(),
-            fill="toself",
-            fillcolor="rgba(0,128,0,0.1)",
-            line=dict(color="rgba(255,255,255,0)"),
-            hoverinfo="skip",
-            showlegend=True,
-            name="Zone gagnée par l'acheteur",
-        )
-    )
-
-    # Ligne verticale du croisement
     if annee_croisement:
         fig.add_vline(
             x=annee_croisement, line_width=2, line_dash="dash", line_color="red"
@@ -1708,7 +1660,6 @@ with st.container():
             arrowhead=1,
             bgcolor="white",
         )
-
     fig.update_layout(
         title="Évolution du patrimoine net - Acheter vs Louer",
         xaxis_title="Année",
