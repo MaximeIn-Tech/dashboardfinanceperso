@@ -6,40 +6,32 @@ def render_footer():
     add_vertical_space(3)
     st.markdown("---")
 
-    # Ajouter une note finale
+    theme_base = st.get_option("theme.base")
+    st.write("Thème actuel :", theme_base)
+
+    if theme_base == "dark":
+        bg_color = "#263238"
+        border_color = "#81d4fa"
+        text_color = "#81d4fa"
+    else:
+        bg_color = "#e3f2fd"
+        border_color = "#2196f3"
+        text_color = "#1976d2"
+
     st.markdown(
-        """
-    <style>
-    /* Style par défaut clair */
-    .note-box {
-        background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+        f"""
+    <div style="
+        background: {bg_color};
         border-radius: 10px;
         padding: 20px;
         margin: 30px 0;
         text-align: center;
-        border: 1px solid #2196f3;
-        color: #1976d2;
+        border: 1px solid {border_color};
+        color: {text_color};
         font-style: italic;
-    }
-    .note-box h5 {
-        color: #1565c0;
-        margin-bottom: 10px;
-    }
-    /* Style pour thème sombre */
-    @media (prefers-color-scheme: dark) {
-        .note-box {
-            background: linear-gradient(135deg, #263238 0%, #37474f 100%);
-            border: 1px solid #81d4fa;
-            color: #81d4fa;
-        }
-        .note-box h5 {
-            color: #4fc3f7;
-        }
-    }
-    </style>
-    <div class="note-box">
-        <h5>📋 Note importante</h5>
-        <p>Ces conseils sont donnés à titre indicatif.<br>Consultez un conseiller fiscal pour une stratégie personnalisée.</p>
+    ">
+        <h5 style="margin-bottom: 10px;">📋 Note importante</h5>
+        Ces conseils sont donnés à titre indicatif.<br>Consultez un conseiller fiscal pour une stratégie personnalisée.
     </div>
     """,
         unsafe_allow_html=True,
