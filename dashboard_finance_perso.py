@@ -1357,309 +1357,195 @@ with tab3:
             st.info("Aucune donnée de tranche disponible")
 
     # Conseils d'optimisation fiscale
-    st.subheader("💡 Conseils d'optimisation fiscale")
+st.subheader("💡 Conseils d'optimisation fiscale")
 
-    # Détecter le thème de l'utilisateur
-    def get_theme_colors():
-        """Retourne les couleurs selon le thème détecté"""
-        # Utiliser st.get_option pour détecter le thème ou injecter du CSS/JS
-        return {
-            "dark": {
-                "background": "linear-gradient(135deg, #2d3748 0%, #4a5568 100%)",
-                "card_bg": "rgba(45, 55, 72, 0.8)",
-                "text_primary": "#f7fafc",
-                "text_secondary": "#cbd5e0",
-                "border": "#4a5568",
-                "shadow": "0 4px 6px rgba(0, 0, 0, 0.3)",
-            },
-            "light": {
-                "background": "linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)",
-                "card_bg": "rgba(248, 249, 250, 0.9)",
-                "text_primary": "#2c3e50",
-                "text_secondary": "#495057",
-                "border": "#dee2e6",
-                "shadow": "0 2px 4px rgba(0,0,0,0.1)",
-            },
-        }
+# Créer les conseils avec catégories et priorités
+conseils_data = []
 
-    # Script JavaScript pour détecter le thème
-    theme_detection_script = """
-    <script>
-    function detectTheme() {
-        const streamlitDoc = window.parent.document;
-        const theme = streamlitDoc.querySelector('html').getAttribute('data-theme') ||
-                    (streamlitDoc.querySelector('[data-testid="stAppViewContainer"]').style.backgroundColor.includes('rgb(14') ? 'dark' : 'light');
-        return theme;
-    }
-
-    function setThemeVariable() {
-        const theme = detectTheme();
-        window.currentTheme = theme;
-
-        // Créer un événement personnalisé pour notifier Streamlit
-        const event = new CustomEvent('themeDetected', { detail: theme });
-        window.dispatchEvent(event);
-    }
-
-    setThemeVariable();
-    </script>
-    """
-
-    # Injecter le script
-    st.components.v1.html(theme_detection_script, height=0)
-
-    # Fonction pour obtenir le style selon le thème
-    def get_card_style(theme_type, priority_color, is_compact=False):
-        colors = get_theme_colors()
-        theme_colors = colors.get(theme_type, colors["light"])
-
-        base_style = f"""
-            background: {theme_colors['card_bg']};
-            border-left: 4px solid {priority_color};
-            border-radius: 8px;
-            padding: {'15px' if is_compact else '20px'};
-            margin: 10px 0;
-            box-shadow: {theme_colors['shadow']};
-            border: 1px solid {theme_colors['border']};
-        """
-
-        if is_compact:
-            base_style += """
-                height: 180px;
-                display: flex;
-                flex-direction: column;
-            """
-
-        return base_style
-
-    def get_text_colors(theme_type):
-        colors = get_theme_colors()
-        return colors.get(theme_type, colors["light"])
-
-    # Créer les conseils avec catégories et priorités
-    conseils_data = []
-
-    if tmi >= 30:
-        conseils_data.append(
-            {
-                "titre": "Plan d'Épargne en Actions (PEA)",
-                "emoji": "🏦",
-                "description": "Optimisez vos investissements avec un PEA",
-                "avantage": "Exonéré d'impôt après 5 ans",
-                "priorite": "Élevée",
-                "categorie": "Épargne & Investissement",
-            }
-        )
-
+if tmi >= 30:
     conseils_data.append(
         {
-            "titre": "Assurance-vie",
-            "emoji": "🏠",
-            "description": "Profitez de l'abattement fiscal",
-            "avantage": "4 600€/an d'abattement après 8 ans",
+            "titre": "Plan d'Épargne en Actions (PEA)",
+            "emoji": "🏦",
+            "description": "Optimisez vos investissements avec un PEA",
+            "avantage": "Exonéré d'impôt après 5 ans",
             "priorite": "Élevée",
             "categorie": "Épargne & Investissement",
         }
     )
 
-    if tmi >= 41:
-        conseils_data.append(
-            {
-                "titre": "Plan d'Épargne Retraite (PER)",
-                "emoji": "📊",
-                "description": "Déduction fiscale sur vos revenus",
-                "avantage": "Jusqu'à 10% de vos revenus déductibles",
-                "priorite": "Très élevée",
-                "categorie": "Retraite & Défiscalisation",
-            }
-        )
+conseils_data.append(
+    {
+        "titre": "Assurance-vie",
+        "emoji": "🏠",
+        "description": "Profitez de l'abattement fiscal",
+        "avantage": "4 600€/an d'abattement après 8 ans",
+        "priorite": "Élevée",
+        "categorie": "Épargne & Investissement",
+    }
+)
 
-        conseils_data.append(
-            {
-                "titre": "Investissement locatif",
-                "emoji": "🏡",
-                "description": "Déficit foncier déductible",
-                "avantage": "Réduction d'impôt par déficit foncier",
-                "priorite": "Moyenne",
-                "categorie": "Immobilier",
-            }
-        )
-
-    if revenus_imposables > 50000:
-        conseils_data.append(
-            {
-                "titre": "Dons aux associations",
-                "emoji": "🎯",
-                "description": "Soutenez des causes tout en réduisant vos impôts",
-                "avantage": "66% de réduction d'impôt",
-                "priorite": "Moyenne",
-                "categorie": "Solidarité",
-            }
-        )
-
-        conseils_data.append(
-            {
-                "titre": "FCPI/FIP",
-                "emoji": "💼",
-                "description": "Investissement dans l'innovation",
-                "avantage": "18% de réduction d'impôt",
-                "priorite": "Faible",
-                "categorie": "Investissement à risque",
-            }
-        )
-
-    if situation_familiale == "Célibataire":
-        conseils_data.append(
-            {
-                "titre": "PACS ou Mariage",
-                "emoji": "💑",
-                "description": "Optimisation fiscale selon les revenus du conjoint",
-                "avantage": "Possible réduction selon situation",
-                "priorite": "Variable",
-                "categorie": "Situation familiale",
-            }
-        )
-
-    # Affichage moderne des conseils
-    if conseils_data:
-        # Grouper par priorité
-        priorites = {
-            "Très élevée": {"conseils": [], "color": "#ff4757", "icon": "🔥"},
-            "Élevée": {"conseils": [], "color": "#ff6b35", "icon": "⭐"},
-            "Moyenne": {"conseils": [], "color": "#ffa502", "icon": "💡"},
-            "Faible": {"conseils": [], "color": "#70a1ff", "icon": "💭"},
-            "Variable": {"conseils": [], "color": "#a4b0be", "icon": "🤔"},
+if tmi >= 41:
+    conseils_data.append(
+        {
+            "titre": "Plan d'Épargne Retraite (PER)",
+            "emoji": "📊",
+            "description": "Déduction fiscale sur vos revenus",
+            "avantage": "Jusqu'à 10% de vos revenus déductibles",
+            "priorite": "Très élevée",
+            "categorie": "Retraite & Défiscalisation",
         }
+    )
 
-        for conseil in conseils_data:
-            priorites[conseil["priorite"]]["conseils"].append(conseil)
+    conseils_data.append(
+        {
+            "titre": "Investissement locatif",
+            "emoji": "🏡",
+            "description": "Déficit foncier déductible",
+            "avantage": "Réduction d'impôt par déficit foncier",
+            "priorite": "Moyenne",
+            "categorie": "Immobilier",
+        }
+    )
 
-        # Détecter le thème (solution alternative plus simple)
-        # Par défaut on utilise le thème sombre, mais on peut ajouter un toggle
-        theme_option = st.sidebar.selectbox(
-            "🎨 Thème d'affichage", ["Auto (détection)", "Clair", "Sombre"], index=0
-        )
+if revenus_imposables > 50000:
+    conseils_data.append(
+        {
+            "titre": "Dons aux associations",
+            "emoji": "🎯",
+            "description": "Soutenez des causes tout en réduisant vos impôts",
+            "avantage": "66% de réduction d'impôt",
+            "priorite": "Moyenne",
+            "categorie": "Solidarité",
+        }
+    )
 
-        # Mapper les options
-        if theme_option == "Clair":
-            current_theme = "light"
-        elif theme_option == "Sombre":
-            current_theme = "dark"
-        else:
-            # Auto-détection basique (peut être améliorée)
-            current_theme = "dark"  # Par défaut sombre pour votre cas
+    conseils_data.append(
+        {
+            "titre": "FCPI/FIP",
+            "emoji": "💼",
+            "description": "Investissement dans l'innovation",
+            "avantage": "18% de réduction d'impôt",
+            "priorite": "Faible",
+            "categorie": "Investissement à risque",
+        }
+    )
 
-        text_colors = get_text_colors(current_theme)
+if situation_familiale == "Célibataire":
+    conseils_data.append(
+        {
+            "titre": "PACS ou Mariage",
+            "emoji": "💑",
+            "description": "Optimisation fiscale selon les revenus du conjoint",
+            "avantage": "Possible réduction selon situation",
+            "priorite": "Variable",
+            "categorie": "Situation familiale",
+        }
+    )
 
-        # Afficher par ordre de priorité
-        for priorite, data in priorites.items():
-            if data["conseils"]:
-                st.markdown(
-                    f"""
-                <div style="margin: 20px 0;">
-                    <h4 style="color: {data['color']}; margin-bottom: 15px;">
-                        {data['icon']} Priorité {priorite}
-                    </h4>
-                </div>
-                """,
-                    unsafe_allow_html=True,
-                )
+# Affichage moderne des conseils
+if conseils_data:
+    # Grouper par priorité
+    priorites = {
+        "Très élevée": {"conseils": [], "color": "#ff4757", "icon": "🔥"},
+        "Élevée": {"conseils": [], "color": "#ff6b35", "icon": "⭐"},
+        "Moyenne": {"conseils": [], "color": "#ffa502", "icon": "💡"},
+        "Faible": {"conseils": [], "color": "#70a1ff", "icon": "💭"},
+        "Variable": {"conseils": [], "color": "#a4b0be", "icon": "🤔"},
+    }
 
-                # Créer des colonnes pour les conseils de même priorité
-                if len(data["conseils"]) == 1:
-                    conseil = data["conseils"][0]
-                    card_style = get_card_style(current_theme, data["color"], False)
-                    with st.container():
+    for conseil in conseils_data:
+        priorites[conseil["priorite"]]["conseils"].append(conseil)
+
+    # Afficher par ordre de priorité
+    for priorite, data in priorites.items():
+        if data["conseils"]:
+            st.markdown(
+                f"""
+            <div style="margin: 20px 0;">
+                <h4 style="color: {data['color']}; margin-bottom: 15px;">
+                    {data['icon']} Priorité {priorite}
+                </h4>
+            </div>
+            """,
+                unsafe_allow_html=True,
+            )
+
+            # Créer des colonnes pour les conseils de même priorité
+            if len(data["conseils"]) == 1:
+                conseil = data["conseils"][0]
+                with st.container():
+                    st.markdown(
+                        f"""
+                    <div style="
+                        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+                        border-left: 4px solid {data['color']};
+                        border-radius: 8px;
+                        padding: 20px;
+                        margin: 10px 0;
+                        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                    ">
+                        <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                            <span style="font-size: 24px; margin-right: 12px;">{conseil['emoji']}</span>
+                            <h5 style="margin: 0; color: #2c3e50;">{conseil['titre']}</h5>
+                        </div>
+                        <p style="margin: 8px 0; color: #495057;">{conseil['description']}</p>
+                        <div style="
+                            background: {data['color']}20;
+                            border-radius: 6px;
+                            padding: 8px 12px;
+                            margin-top: 10px;
+                        ">
+                            <strong style="color: {data['color']};">💰 {conseil['avantage']}</strong>
+                        </div>
+                        <small style="color: #6c757d; font-style: italic;">
+                            📂 {conseil['categorie']}
+                        </small>
+                    </div>
+                    """,
+                        unsafe_allow_html=True,
+                    )
+            else:
+                # Afficher en colonnes si plusieurs conseils
+                cols = st.columns(min(len(data["conseils"]), 2))
+                for i, conseil in enumerate(data["conseils"]):
+                    with cols[i % 2]:
                         st.markdown(
                             f"""
-                        <div style="{card_style}">
-                            <div style="display: flex; align-items: center; margin-bottom: 10px;">
-                                <span style="font-size: 24px; margin-right: 12px;">{conseil['emoji']}</span>
-                                <h5 style="margin: 0; color: {text_colors['text_primary']};">{conseil['titre']}</h5>
+                        <div style="
+                            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+                            border-left: 4px solid {data['color']};
+                            border-radius: 8px;
+                            padding: 15px;
+                            margin: 10px 0;
+                            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                            height: 180px;
+                            display: flex;
+                            flex-direction: column;
+                        ">
+                            <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                                <span style="font-size: 20px; margin-right: 8px;">{conseil['emoji']}</span>
+                                <h6 style="margin: 0; color: #2c3e50; font-size: 14px;">{conseil['titre']}</h6>
                             </div>
-                            <p style="margin: 8px 0; color: {text_colors['text_secondary']};">{conseil['description']}</p>
+                            <p style="margin: 5px 0; color: #495057; font-size: 12px; flex-grow: 1;">
+                                {conseil['description']}
+                            </p>
                             <div style="
                                 background: {data['color']}20;
-                                border-radius: 6px;
-                                padding: 8px 12px;
-                                margin-top: 10px;
+                                border-radius: 4px;
+                                padding: 6px 8px;
+                                margin-top: auto;
                             ">
-                                <strong style="color: {data['color']};">💰 {conseil['avantage']}</strong>
+                                <strong style="color: {data['color']}; font-size: 11px;">
+                                    💰 {conseil['avantage']}
+                                </strong>
                             </div>
-                            <small style="color: {text_colors['text_secondary']}; opacity: 0.8; font-style: italic;">
-                                📂 {conseil['categorie']}
-                            </small>
                         </div>
                         """,
                             unsafe_allow_html=True,
                         )
-                else:
-                    # Afficher en colonnes si plusieurs conseils
-                    cols = st.columns(min(len(data["conseils"]), 2))
-                    for i, conseil in enumerate(data["conseils"]):
-                        with cols[i % 2]:
-                            card_style = get_card_style(
-                                current_theme, data["color"], True
-                            )
-                            st.markdown(
-                                f"""
-                            <div style="{card_style}">
-                                <div style="display: flex; align-items: center; margin-bottom: 8px;">
-                                    <span style="font-size: 20px; margin-right: 8px;">{conseil['emoji']}</span>
-                                    <h6 style="margin: 0; color: {text_colors['text_primary']}; font-size: 14px;">{conseil['titre']}</h6>
-                                </div>
-                                <p style="margin: 5px 0; color: {text_colors['text_secondary']}; font-size: 12px; flex-grow: 1;">
-                                    {conseil['description']}
-                                </p>
-                                <div style="
-                                    background: {data['color']}20;
-                                    border-radius: 4px;
-                                    padding: 6px 8px;
-                                    margin-top: auto;
-                                ">
-                                    <strong style="color: {data['color']}; font-size: 11px;">
-                                        💰 {conseil['avantage']}
-                                    </strong>
-                                </div>
-                            </div>
-                            """,
-                                unsafe_allow_html=True,
-                            )
-
-        # Ajouter une note finale avec thème adaptatif
-        note_bg = (
-            "rgba(45, 55, 72, 0.6)"
-            if current_theme == "dark"
-            else "linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%)"
-        )
-        note_border = "#4a90e2" if current_theme == "dark" else "#2196f3"
-        note_text = text_colors["text_primary"]
-
-        st.markdown(
-            f"""
-        <div style="
-            background: {note_bg};
-            border-radius: 10px;
-            padding: 20px;
-            margin: 30px 0;
-            text-align: center;
-            border: 1px solid {note_border};
-        ">
-            <h5 style="color: {note_text}; margin-bottom: 10px;">
-                📋 Note importante
-            </h5>
-            <p style="color: {text_colors['text_secondary']}; margin: 0; font-style: italic;">
-                Ces conseils sont donnés à titre indicatif.
-                Consultez un conseiller fiscal pour une stratégie personnalisée.
-            </p>
-        </div>
-        """,
-            unsafe_allow_html=True,
-        )
-    else:
-        st.info(
-            "Aucun conseil d'optimisation spécifique pour votre situation actuelle."
-        )
+else:
+    st.info("Aucun conseil d'optimisation spécifique pour votre situation actuelle.")
 
 # ============= ONGLET 4: ACHETER VS LOUER =============
 
