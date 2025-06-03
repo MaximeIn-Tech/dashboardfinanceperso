@@ -1488,6 +1488,43 @@ with tab4:
     st.subheader("📈 Comparaison visuelle")
     df = pd.DataFrame(data)
 
+    # Valeurs finales
+    portefeuille_acheteur_final = df["Valeur Nette Acheteur (€)"].iloc[-1]
+    portefeuille_locataire_final = df["Portefeuille Locataire (€)"].iloc[-1]
+
+    # Calcul de la différence en pourcentage
+    diff_pct = (
+        (portefeuille_acheteur_final - portefeuille_locataire_final)
+        / portefeuille_locataire_final
+        * 100
+        if portefeuille_locataire_final != 0
+        else 0
+    )
+
+    st.subheader("📊 Comparaison finale")
+
+    col1, col2, col3 = st.columns(3)
+
+    with col1:
+        st.metric(
+            label="📦 Portefeuille Acheteur",
+            value=f"{portefeuille_acheteur_final:,.0f} €",
+        )
+
+    with col2:
+        st.metric(
+            label="💼 Portefeuille Locataire",
+            value=f"{portefeuille_locataire_final:,.0f} €",
+        )
+
+    with col3:
+        delta_str = f"{diff_pct:+.1f} %"
+        st.metric(
+            label="🔍 Différence Relative",
+            value="Acheteur > Locataire" if diff_pct > 0 else "Locataire > Acheteur",
+            delta=delta_str,
+        )
+
     fig = go.Figure()
     fig.add_trace(
         go.Scatter(
