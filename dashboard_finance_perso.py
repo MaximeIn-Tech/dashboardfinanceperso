@@ -1514,14 +1514,12 @@ with tab4:
             label="💼 Portefeuille Locataire",
             value=f"{portefeuille_locataire_final:,.0f} €",
             delta=delta_str,
-            delta_color="off",  # Pas de flèche, juste le texte du delta
         )
 
     with col3:
         st.metric(
             label="🔍 Différence Relative",
             value="Acheteur > Locataire" if diff_pct > 0 else "Locataire > Acheteur",
-            delta=None,  # Pas de delta ici, uniquement le texte
         )
 
     fig = go.Figure()
