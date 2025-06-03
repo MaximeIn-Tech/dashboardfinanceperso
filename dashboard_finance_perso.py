@@ -1053,7 +1053,7 @@ with tab3:
     with col1:
         st.subheader("💰 Revenus")
         revenus_imposables = st.number_input(
-            "Revenus imposables annuels (€)",
+            "Revenus bruts annuels (€)",
             min_value=0.0,
             value=45000.0,
             step=1000.0,
@@ -1180,7 +1180,9 @@ with tab3:
     col1, col2, col3, col4 = st.columns(4)
 
     with col1:
-        st.metric("💼 Revenus bruts", f"{format_nombre(revenus_imposables)} €")
+        st.metric(
+            "💼 Revenus annuels imposables", f"{format_nombre(revenus_imposables)} €"
+        )
 
     with col2:
         st.metric(
