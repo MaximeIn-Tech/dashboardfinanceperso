@@ -1495,13 +1495,13 @@ with tab3:
         padding: 8px;
         margin-top: auto;
         font-weight: 600;
-        font-size: 11px;
+        font-size: 14px;
     }
 
     .conseil-categorie {
         color: var(--text-muted-color);
         font-style: italic;
-        font-size: 12px;
+        font-size: 14px;
         margin-top: 8px;
     }
 
