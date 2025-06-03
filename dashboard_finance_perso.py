@@ -1387,6 +1387,7 @@ with tab4:
     col1, col2 = st.columns(2)
 
     with col1:
+        st.subheader("Acheter")
         prix_bien = st.number_input(
             "Prix du bien (€)", 100000, 2000000, 300000, step=10000
         )
@@ -1412,6 +1413,7 @@ with tab4:
         )
 
     with col2:
+        st.subheader("Louer")
         loyer_initial = st.number_input("Loyer mensuel (€)", 300, 5000, 1000, step=50)
         croissance_loyer = (
             st.number_input("Croissance annuelle du loyer (%)", 0.0, 5.0, 1.5, step=0.1)
