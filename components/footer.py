@@ -6,9 +6,27 @@ def render_footer():
     add_vertical_space(3)
     st.markdown("---")
 
-    # Avertissement légal
-    st.info(
-        "🚫 Ceci n'est pas un conseil en investissement. Les informations présentées sont fournies à titre indicatif uniquement."
+    # Ajouter une note finale
+    st.markdown(
+        """
+    <div style="
+        background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+        border-radius: 10px;
+        padding: 20px;
+        margin: 30px 0;
+        text-align: center;
+        border: 1px solid #2196f3;
+    ">
+        <h5 style="color: #1565c0; margin-bottom: 10px;">
+            📋 Note importante
+        </h5>
+        <p style="color: #1976d2; margin: 0; font-style: italic;">
+            Ces conseils sont donnés à titre indicatif.
+            Consultez un conseiller fiscal pour une stratégie personnalisée.
+        </p>
+    </div>
+    """,
+        unsafe_allow_html=True,
     )
 
     # Footer HTML avec logos
