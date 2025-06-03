@@ -1287,7 +1287,7 @@ with tab3:
                             direction="clockwise",
                             sort=False,
                             marker_colors=tranches_colors[: len(tranches_values)],
-                            textinfo="label+percent",
+                            textinfo="label+value",
                             textposition="auto",
                             # Configuration pour faire un demi-cercle
                             rotation=90,
@@ -1336,7 +1336,7 @@ with tab3:
                 fig_semi_alt.update_traces(
                     rotation=90,
                     direction="clockwise",
-                    textinfo="label+percent",
+                    textinfo="label+value",
                     textposition="auto",
                     hole=0.4,
                     pull=[0.05] * len(tranches_values),
