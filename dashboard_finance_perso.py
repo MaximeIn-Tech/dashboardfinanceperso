@@ -1466,23 +1466,24 @@ with tab3:
     }
 
     .note-finale {
-        background: var(--secondary-background-color);
-        border: 1px solid var(--primary-color);
-        border-radius: 12px;
-        padding: 20px;
-        margin: 30px 0;
-        text-align: center;
+    background: var(--secondary-background-color, #f2f2f2);
+    border: 1px solid var(--primary-color, #FF4B4B);
+    border-radius: 12px;
+    padding: 20px;
+    margin: 30px 0;
+    text-align: center;
     }
 
     .note-titre {
-    color: var(--text-muted-color);
-    margin-bottom: 10px;
-    font-size: 16px;
-    font-weight: 600;
+        color: var(--text-muted-color, #333333);
+        margin-bottom: 10px;
+        font-size: 16px;
+        font-weight: 600;
     }
 
     .note-texte {
-        color: var(--text-color); opacity: 0.8;
+        color: var(--text-color, #333333);
+        opacity: 0.8;
         margin: 0;
         font-style: italic;
     }
