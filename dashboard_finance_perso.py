@@ -1631,7 +1631,8 @@ with st.container():
             y=df["Portefeuille Locataire (€)"],
             mode="lines+markers",
             name="💼 Portefeuille Locataire",
-            line=dict(color="orange", width=3),
+            fill="tonexty",
+            line=dict(color="ff7f0e", width=3),
             marker=dict(size=6),
         )
     )
@@ -1641,7 +1642,8 @@ with st.container():
             y=df["Valeur Nette Acheteur (€)"],
             mode="lines+markers",
             name="🏡 Valeur Nette Acheteur",
-            line=dict(color="blue", width=3),
+            fill="tonexty",
+            line=dict(color="1f77b4", width=3),
             marker=dict(size=6),
         )
     )
