@@ -1454,7 +1454,7 @@ with tab3:
     .conseil-description-compact {
         color: var(--text-muted-color);
         margin: 5px 0;
-        font-size: 12px;
+        font-size: 16px;
         line-height: 1.3;
         flex-grow: 1;
     }
