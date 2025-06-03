@@ -10,7 +10,7 @@ def render_footer():
     st.markdown(
         """
         <style>
-            .note-titre {
+        .note-titre {
             color: #FAFAFA !important; /* Couleur fixe sombre */
             margin-bottom: 10px;
             font-size: 50px;
