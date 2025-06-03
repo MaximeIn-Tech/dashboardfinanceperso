@@ -1522,6 +1522,16 @@ with tab4:
             value="Acheteur > Locataire" if diff_pct > 0 else "Locataire > Acheteur",
         )
 
+    annee_croisement = None
+    for i in range(1, len(df)):
+        if (
+            df["Portefeuille Locataire (€)"][i] > df["Valeur Nette Acheteur (€)"][i]
+            and df["Portefeuille Locataire (€)"][i - 1]
+            <= df["Valeur Nette Acheteur (€)"][i - 1]
+        ):
+            annee_croisement = df["Année"][i]
+            break
+
     fig = go.Figure()
     fig.add_trace(
         go.Scatter(
@@ -1539,6 +1549,21 @@ with tab4:
             name="🏡 Valeur Nette Acheteur",
         )
     )
+
+    if annee_croisement:
+        fig.add_vline(
+            x=annee_croisement, line_width=2, line_dash="dash", line_color="red"
+        )
+        fig.add_annotation(
+            x=annee_croisement,
+            y=max(
+                df["Portefeuille Locataire (€)"].max(),
+                df["Valeur Nette Acheteur (€)"].max(),
+            ),
+            text=f"📍 Croisement: Année {annee_croisement}",
+            showarrow=True,
+            arrowhead=1,
+        )
     fig.update_layout(
         title="Évolution du patrimoine net - Acheter vs Louer",
         xaxis_title="Année",
@@ -1547,14 +1572,15 @@ with tab4:
     )
     st.plotly_chart(fig, use_container_width=True)
 
-    st.dataframe(df, use_container_width=True)
+    with st.expander("Tableau comparatif", expanded=False):
+        st.dataframe(df, use_container_width=True, hide_index=True)
 
-    st.markdown(
+    st.info(
         """
     **💡 Interprétation :**
-    - Le portefeuille du locataire représente l'argent investi de façon autonome.
-    - La valeur nette de l'acheteur inclut la plus-value du bien, le remboursement du crédit et le cash épargné.
-    - Les frais de revente sont pris en compte pour un scénario plus réaliste.
+    - Le portefeuille locataire inclut l'apport investi et les économies réalisées chaque année.
+    - La valeur nette acheteur tient compte de la revente du bien (avec frais) et du capital remboursé.
+    - La ligne rouge verticale indique l'année où louer devient plus rentable qu'acheter (si applicable).
     """
     )
 
