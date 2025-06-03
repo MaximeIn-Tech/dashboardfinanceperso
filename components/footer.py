@@ -10,9 +10,9 @@ def render_footer():
     st.write("Thème actuel :", theme_base)
 
     if theme_base == "dark":
-        bg_color = "#263238"
+        bg_color = "#0E1117"
         border_color = "#81d4fa"
-        text_color = "#81d4fa"
+        text_color = "#FAFAFA"
     else:
         bg_color = "#e3f2fd"
         border_color = "#2196f3"

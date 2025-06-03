@@ -1357,7 +1357,167 @@ with tab3:
             st.info("Aucune donnée de tranche disponible")
 
         # Conseils d'optimisation fiscale
+    # Conseils d'optimisation fiscale
     st.subheader("💡 Conseils d'optimisation fiscale")
+
+    # CSS personnalisé qui utilise automatiquement les variables CSS de Streamlit
+    st.markdown(
+        """
+    <style>
+    /* Récupération des variables CSS de Streamlit */
+    :root {
+    --primary-color: #FF4B4B;
+    --background-color: #0E1117;
+    --secondary-background-color: #262730;
+    --text-color: #FAFAFA;
+    }
+
+    .conseil-card {
+        background: var(--secondary-background-color);
+        border-radius: 12px;
+        padding: 20px;
+        margin: 15px 0;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .conseil-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 12px rgba(0, 0, 0, 0.4);
+    }
+
+    .conseil-card-compact {
+        background: var(--secondary-background-color);
+        border-radius: 12px;
+        padding: 15px;
+        margin: 10px 0;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        height: 200px;
+        display: flex;
+        flex-direction: column;
+        transition: transform 0.2s ease;
+    }
+
+    .conseil-card-compact:hover {
+        transform: translateY(-2px);
+    }
+
+    .conseil-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 12px;
+    }
+
+    .conseil-emoji {
+        font-size: 24px;
+        margin-right: 12px;
+    }
+
+    .conseil-title {
+        margin: 0;
+        color: var(--text-color);
+        font-size: 16px;
+        font-weight: 600;
+    }
+
+    .conseil-title-compact {
+        margin: 0;
+        color: var(--text-color);
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    .conseil-description {
+        color: rgba(250, 250, 250, 0.8);
+        margin: 8px 0;
+        line-height: 1.4;
+    }
+
+    .conseil-description-compact {
+        color: rgba(250, 250, 250, 0.8);
+        margin: 5px 0;
+        font-size: 12px;
+        line-height: 1.3;
+        flex-grow: 1;
+    }
+
+    .conseil-avantage {
+        border-radius: 8px;
+        padding: 10px 12px;
+        margin-top: 12px;
+        font-weight: 600;
+        font-size: 13px;
+    }
+
+    .conseil-avantage-compact {
+        border-radius: 6px;
+        padding: 8px;
+        margin-top: auto;
+        font-weight: 600;
+        font-size: 11px;
+    }
+
+    .conseil-categorie {
+        color: rgba(250, 250, 250, 0.6);
+        font-style: italic;
+        font-size: 12px;
+        margin-top: 8px;
+    }
+
+    .priorite-header {
+        margin: 25px 0 15px 0;
+        font-size: 18px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+    }
+
+    .note-finale {
+        background: var(--secondary-background-color);
+        border: 1px solid var(--primary-color);
+        border-radius: 12px;
+        padding: 20px;
+        margin: 30px 0;
+        text-align: center;
+    }
+
+    .note-titre {
+        color: var(--text-color);
+        margin-bottom: 10px;
+        font-size: 16px;
+        font-weight: 600;
+    }
+
+    .note-texte {
+        color: rgba(250, 250, 250, 0.8);
+        margin: 0;
+        font-style: italic;
+    }
+
+    /* Couleurs spécifiques pour chaque priorité */
+    .priorite-tres-elevee { color: #ff4757; }
+    .priorite-elevee { color: #ff6b35; }
+    .priorite-moyenne { color: #ffa502; }
+    .priorite-faible { color: #70a1ff; }
+    .priorite-variable { color: #a4b0be; }
+
+    .border-tres-elevee { border-left: 4px solid #ff4757; }
+    .border-elevee { border-left: 4px solid #ff6b35; }
+    .border-moyenne { border-left: 4px solid #ffa502; }
+    .border-faible { border-left: 4px solid #70a1ff; }
+    .border-variable { border-left: 4px solid #a4b0be; }
+
+    .bg-tres-elevee { background: rgba(255, 71, 87, 0.15); }
+    .bg-elevee { background: rgba(255, 107, 53, 0.15); }
+    .bg-moyenne { background: rgba(255, 165, 2, 0.15); }
+    .bg-faible { background: rgba(112, 161, 255, 0.15); }
+    .bg-variable { background: rgba(164, 176, 190, 0.15); }
+    </style>
+    """,
+        unsafe_allow_html=True,
+    )
 
     # Créer les conseils avec catégories et priorités
     conseils_data = []
@@ -1447,11 +1607,11 @@ with tab3:
     if conseils_data:
         # Grouper par priorité
         priorites = {
-            "Très élevée": {"conseils": [], "color": "#ff4757", "icon": "🔥"},
-            "Élevée": {"conseils": [], "color": "#ff6b35", "icon": "⭐"},
-            "Moyenne": {"conseils": [], "color": "#ffa502", "icon": "💡"},
-            "Faible": {"conseils": [], "color": "#70a1ff", "icon": "💭"},
-            "Variable": {"conseils": [], "color": "#a4b0be", "icon": "🤔"},
+            "Très élevée": {"conseils": [], "icon": "🔥", "css_class": "tres-elevee"},
+            "Élevée": {"conseils": [], "icon": "⭐", "css_class": "elevee"},
+            "Moyenne": {"conseils": [], "icon": "💡", "css_class": "moyenne"},
+            "Faible": {"conseils": [], "icon": "💭", "css_class": "faible"},
+            "Variable": {"conseils": [], "icon": "🤔", "css_class": "variable"},
         }
 
         for conseil in conseils_data:
@@ -1462,10 +1622,8 @@ with tab3:
             if data["conseils"]:
                 st.markdown(
                     f"""
-                <div style="margin: 20px 0;">
-                    <h4 style="color: {data['color']}; margin-bottom: 15px;">
-                        {data['icon']} Priorité {priorite}
-                    </h4>
+                <div class="priorite-header priorite-{data['css_class']}">
+                    {data['icon']} Priorité {priorite}
                 </div>
                 """,
                     unsafe_allow_html=True,
@@ -1474,37 +1632,24 @@ with tab3:
                 # Créer des colonnes pour les conseils de même priorité
                 if len(data["conseils"]) == 1:
                     conseil = data["conseils"][0]
-                    with st.container():
-                        st.markdown(
-                            f"""
-                        <div style="
-                            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-                            border-left: 4px solid {data['color']};
-                            border-radius: 8px;
-                            padding: 20px;
-                            margin: 10px 0;
-                            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-                        ">
-                            <div style="display: flex; align-items: center; margin-bottom: 10px;">
-                                <span style="font-size: 24px; margin-right: 12px;">{conseil['emoji']}</span>
-                                <h5 style="margin: 0; color: #2c3e50;">{conseil['titre']}</h5>
-                            </div>
-                            <p style="margin: 8px 0; color: #495057;">{conseil['description']}</p>
-                            <div style="
-                                background: {data['color']}20;
-                                border-radius: 6px;
-                                padding: 8px 12px;
-                                margin-top: 10px;
-                            ">
-                                <strong style="color: {data['color']};">💰 {conseil['avantage']}</strong>
-                            </div>
-                            <small style="color: #6c757d; font-style: italic;">
-                                📂 {conseil['categorie']}
-                            </small>
+                    st.markdown(
+                        f"""
+                    <div class="conseil-card border-{data['css_class']}">
+                        <div class="conseil-header">
+                            <span class="conseil-emoji">{conseil['emoji']}</span>
+                            <h5 class="conseil-title">{conseil['titre']}</h5>
                         </div>
-                        """,
-                            unsafe_allow_html=True,
-                        )
+                        <p class="conseil-description">{conseil['description']}</p>
+                        <div class="conseil-avantage bg-{data['css_class']}">
+                            💰 {conseil['avantage']}
+                        </div>
+                        <div class="conseil-categorie">
+                            📂 {conseil['categorie']}
+                        </div>
+                    </div>
+                    """,
+                        unsafe_allow_html=True,
+                    )
                 else:
                     # Afficher en colonnes si plusieurs conseils
                     cols = st.columns(min(len(data["conseils"]), 2))
@@ -1512,43 +1657,41 @@ with tab3:
                         with cols[i % 2]:
                             st.markdown(
                                 f"""
-                            <div style="
-                                background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-                                border-left: 4px solid {data['color']};
-                                border-radius: 8px;
-                                padding: 15px;
-                                margin: 10px 0;
-                                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-                                height: 180px;
-                                display: flex;
-                                flex-direction: column;
-                            ">
-                                <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                            <div class="conseil-card-compact border-{data['css_class']}">
+                                <div class="conseil-header">
                                     <span style="font-size: 20px; margin-right: 8px;">{conseil['emoji']}</span>
-                                    <h6 style="margin: 0; color: #2c3e50; font-size: 14px;">{conseil['titre']}</h6>
+                                    <h6 class="conseil-title-compact">{conseil['titre']}</h6>
                                 </div>
-                                <p style="margin: 5px 0; color: #495057; font-size: 12px; flex-grow: 1;">
+                                <p class="conseil-description-compact">
                                     {conseil['description']}
                                 </p>
-                                <div style="
-                                    background: {data['color']}20;
-                                    border-radius: 4px;
-                                    padding: 6px 8px;
-                                    margin-top: auto;
-                                ">
-                                    <strong style="color: {data['color']}; font-size: 11px;">
-                                        💰 {conseil['avantage']}
-                                    </strong>
+                                <div class="conseil-avantage-compact bg-{data['css_class']}">
+                                    💰 {conseil['avantage']}
                                 </div>
                             </div>
                             """,
                                 unsafe_allow_html=True,
                             )
+
+        # Note finale avec style adaptatif
+        st.markdown(
+            """
+        <div class="note-finale">
+            <h5 class="note-titre">
+                📋 Note importante
+            </h5>
+            <p class="note-texte">
+                Ces conseils sont donnés à titre indicatif.
+                Consultez un conseiller fiscal pour une stratégie personnalisée.
+            </p>
+        </div>
+        """,
+            unsafe_allow_html=True,
+        )
     else:
         st.info(
             "Aucun conseil d'optimisation spécifique pour votre situation actuelle."
         )
-
 # ============= ONGLET 4: ACHETER VS LOUER =============
 
 with tab4:
