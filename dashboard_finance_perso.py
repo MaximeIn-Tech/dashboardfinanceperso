@@ -1148,7 +1148,7 @@ with tab3:
     impot_net = max(0, impot_brut - decote)
 
     # Taux moyen
-    taux_moyen = (impot_net / revenus_abattus * 100) if revenus_abattus > 0 else 0
+    taux_moyen = (impot_net / revenus_imposables * 100) if revenus_abattus > 0 else 0
 
     # Revenus nets après IR
     revenus_nets_ir = revenus_abattus - impot_net
