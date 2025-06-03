@@ -1382,12 +1382,26 @@ with tab4:
         return soldes_annuels
 
     # Entrées utilisateur
-    st.title("🏠 Simulateur Acheter vs Louer")
+st.title("🏠 Simulateur Acheter vs Louer")
 
+st.markdown(
+    """
+<style>
+input[type=number] {
+    border-radius: 0.5rem;
+    padding: 0.5rem;
+}
+</style>
+""",
+    unsafe_allow_html=True,
+)
+
+with st.container():
+    st.markdown("### 📋 Paramètres de la simulation")
     col1, col2 = st.columns(2)
 
     with col1:
-        st.subheader("Acheter")
+        st.markdown("#### 🏡 Acheter")
         prix_bien = st.number_input(
             "Prix du bien (€)", 100000, 2000000, 300000, step=10000
         )
@@ -1409,11 +1423,11 @@ with tab4:
             / 100
         )
         frais_revente = (
-            st.number_input("Frais de revente (%)", 0.0, 10.0, 5.0, step=0.5) / 100
+            st.number_input("Frais de revente (%)", 0.0, 10.0, 6.0, step=0.1) / 100
         )
 
     with col2:
-        st.subheader("Louer")
+        st.markdown("#### 🏠 Louer")
         loyer_initial = st.number_input("Loyer mensuel (€)", 300, 5000, 1000, step=50)
         croissance_loyer = (
             st.number_input("Croissance annuelle du loyer (%)", 0.0, 5.0, 1.5, step=0.1)
