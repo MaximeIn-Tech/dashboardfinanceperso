@@ -1227,21 +1227,17 @@ with tab3:
 
     # Détail des tranches
     st.subheader("📋 Détail du calcul par tranches")
-
     detail_tranches = []
     cumul_impot = 0
-
     for i, (seuil_inf, seuil_sup, taux) in enumerate(tranches):
         if quotient_familial > seuil_inf:
             base = min(quotient_familial, seuil_sup) - seuil_inf
             impot_tranche = base * (taux / 100)
             cumul_impot += impot_tranche
-
             if seuil_sup == float("inf"):
                 tranche_desc = f"Au-delà de {seuil_inf:,.0f} €"
             else:
                 tranche_desc = f"De {seuil_inf:,.0f} € à {seuil_sup:,.0f} €"
-
             detail_tranches.append(
                 {
                     "Tranche": tranche_desc,
@@ -1259,11 +1255,11 @@ with tab3:
     if decote > 0:
         st.info(f"✅ Décote appliquée : {decote:,.0f} € (impôt réduit)")
 
-    # Graphique répartition
+    # Graphiques répartition
     col1, col2 = st.columns(2)
 
     with col1:
-        # Graphique camembert
+        # Graphique camembert revenus
         if cotisations > 0:
             values = [revenus_nets_total, impot_net, cotisations]
             labels = ["Revenus nets", "Impôt sur le revenu", "Cotisations sociales"]
@@ -1282,65 +1278,101 @@ with tab3:
         st.plotly_chart(fig_pie, use_container_width=True)
 
     with col2:
-        # Simulation d'augmentation
-        st.subheader("🔮 Impact d'une augmentation")
-        augmentation = st.slider(
-            "Augmentation de salaire (€)",
-            min_value=0,
-            max_value=10000,
-            value=1000,
-            step=100,
-            key="tmi_augmentation",
-        )
+        # Demi-camembert pour les tranches d'imposition
+        if detail_tranches:
+            # Préparer les données pour le graphique des tranches
+            tranches_values = []
+            tranches_labels = []
+            tranches_colors = ["#e8f4fd", "#87ceeb", "#4682b4", "#ff6b6b", "#ff4757"]
 
-        if augmentation > 0:
-            nouveaux_revenus = revenus_imposables + augmentation
-            nouveau_quotient = nouveaux_revenus / nb_parts
+            for i, tranche in enumerate(detail_tranches):
+                # Récupérer le montant d'impôt total pour chaque tranche
+                impot_value = float(
+                    tranche["Impôt total"].replace(" €", "").replace(",", "")
+                )
+                if impot_value > 0:
+                    tranches_values.append(impot_value)
+                    tranches_labels.append(f"Tranche {tranche['Taux']}")
 
-            # Recalcul rapide
-            nouvel_impot_par_part = 0
-            nouvelle_tmi = 0
-
-            for seuil_inf, seuil_sup, taux in tranches:
-                if nouveau_quotient > seuil_inf:
-                    base_imposable = min(nouveau_quotient, seuil_sup) - seuil_inf
-                    nouvel_impot_par_part += base_imposable * (taux / 100)
-                    if nouveau_quotient > seuil_inf:
-                        nouvelle_tmi = taux
-
-            nouvel_impot_brut = nouvel_impot_par_part * nb_parts
-
-            # Nouvelle décote
-            nouvelle_decote = 0
-            if nouvel_impot_brut < seuil_decote:
-                nouvelle_decote = min(
-                    nouvel_impot_brut, (seuil_decote - nouvel_impot_brut) * 0.45
+            if tranches_values:
+                # Créer le demi-camembert
+                fig_semi = go.Figure(
+                    data=[
+                        go.Pie(
+                            labels=tranches_labels,
+                            values=tranches_values,
+                            hole=0.3,
+                            direction="clockwise",
+                            sort=False,
+                            marker_colors=tranches_colors[: len(tranches_values)],
+                            textinfo="label+percent",
+                            textposition="auto",
+                            # Configuration pour faire un demi-cercle
+                            rotation=90,
+                            pull=[
+                                0.1 if i == 0 else 0
+                                for i in range(len(tranches_values))
+                            ],
+                        )
+                    ]
                 )
 
-            nouvel_impot_net = max(0, nouvel_impot_brut - nouvelle_decote)
-
-            augmentation_impot = nouvel_impot_net - impot_net
-            augmentation_nette = augmentation - augmentation_impot
-
-            if cotisations > 0:
-                nouvelles_cotisations = nouveaux_revenus * cotisations_rate
-                augmentation_cotisations = nouvelles_cotisations - cotisations
-                augmentation_nette -= augmentation_cotisations
-                taux_prelevement = (
-                    (augmentation_impot + augmentation_cotisations) / augmentation * 100
+                # Configurer le layout pour un demi-cercle
+                fig_semi.update_layout(
+                    title="Tranches d'imposition",
+                    showlegend=True,
+                    legend=dict(
+                        orientation="v", yanchor="middle", y=0.5, xanchor="left", x=1.01
+                    ),
+                    margin=dict(l=20, r=20, t=40, b=20),
+                    # Force un demi-cercle en limitant l'angle
+                    shapes=[
+                        dict(
+                            type="rect",
+                            xref="paper",
+                            yref="paper",
+                            x0=0,
+                            y0=0,
+                            x1=1,
+                            y1=0.5,
+                            fillcolor="white",
+                            line=dict(color="white", width=0),
+                            layer="above",
+                        )
+                    ],
                 )
+
+                # Alternative plus simple : utiliser un graphique en secteurs avec rotation
+                fig_semi_alt = px.pie(
+                    values=tranches_values,
+                    names=tranches_labels,
+                    title="Tranches d'imposition",
+                    color_discrete_sequence=tranches_colors[: len(tranches_values)],
+                )
+
+                # Modifier pour ressembler à un demi-camembert
+                fig_semi_alt.update_traces(
+                    rotation=90,
+                    direction="clockwise",
+                    textinfo="label+percent",
+                    textposition="auto",
+                    hole=0.4,
+                    pull=[0.05] * len(tranches_values),
+                )
+
+                fig_semi_alt.update_layout(
+                    showlegend=True,
+                    legend=dict(
+                        orientation="h", yanchor="top", y=-0.1, xanchor="center", x=0.5
+                    ),
+                    margin=dict(l=20, r=20, t=40, b=80),
+                )
+
+                st.plotly_chart(fig_semi_alt, use_container_width=True)
             else:
-                taux_prelevement = augmentation_impot / augmentation * 100
-
-            st.info(
-                f"""
-            **Pour +{augmentation:,.0f} € bruts :**
-            - Nouvel impôt : +{augmentation_impot:,.0f} €
-            {"- Nouvelles cotisations : +" + f"{augmentation_cotisations:,.0f}" + " €" if cotisations > 0 else ""}
-            - **Gain net : +{augmentation_nette:,.0f} €**
-            - **Taux de prélèvement : {taux_prelevement:.1f}%**
-            """
-            )
+                st.info("Aucune tranche d'imposition applicable")
+        else:
+            st.info("Aucune donnée de tranche disponible")
 
     # Conseils d'optimisation
     st.subheader("💡 Conseils d'optimisation fiscale")
