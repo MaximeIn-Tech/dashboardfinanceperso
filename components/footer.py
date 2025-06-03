@@ -18,24 +18,21 @@ def render_footer():
         border_color = "#2196f3"
         text_color = "#1976d2"
 
-    st.markdown(
-        f"""
-    <div style="
-        background: {bg_color};
-        border-radius: 10px;
-        padding: 20px;
-        margin: 30px 0;
-        text-align: center;
-        border: 1px solid {border_color};
-        color: {text_color};
-        font-style: italic;
-    ">
-        <h5 style="margin-bottom: 10px;">📋 Note importante</h5>
-        Ces conseils sont donnés à titre indicatif.<br>Consultez un conseiller fiscal pour une stratégie personnalisée.
-    </div>
-    """,
-        unsafe_allow_html=True,
-    )
+        # Note finale avec style adaptatif
+        st.markdown(
+            """
+        <div class="note-finale">
+            <h5 class="note-titre">
+                📋 Note importante
+            </h5>
+            <p class="note-texte">
+                Ces conseils sont donnés à titre indicatif.
+                Consultez un conseiller fiscal pour une stratégie personnalisée.
+            </p>
+        </div>
+        """,
+            unsafe_allow_html=True,
+        )
 
     # Footer HTML avec logos
     st.markdown(

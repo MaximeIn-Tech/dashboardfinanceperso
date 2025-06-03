@@ -1672,22 +1672,6 @@ with tab3:
                             """,
                                 unsafe_allow_html=True,
                             )
-
-        # Note finale avec style adaptatif
-        st.markdown(
-            """
-        <div class="note-finale">
-            <h5 class="note-titre">
-                📋 Note importante
-            </h5>
-            <p class="note-texte">
-                Ces conseils sont donnés à titre indicatif.
-                Consultez un conseiller fiscal pour une stratégie personnalisée.
-            </p>
-        </div>
-        """,
-            unsafe_allow_html=True,
-        )
     else:
         st.info(
             "Aucun conseil d'optimisation spécifique pour votre situation actuelle."
