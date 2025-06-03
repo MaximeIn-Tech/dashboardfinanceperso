@@ -1357,6 +1357,7 @@ with tab3:
 # ============= ONGLET 4: ACHETER VS LOUER =============
 
 with tab4:
+
     # Fonction de calcul des mensualités de prêt
     def calcul_mensualite_emprunt(montant, taux_annuel, duree_annees):
         taux_mensuel = taux_annuel / 12
@@ -1376,27 +1377,36 @@ with tab4:
             "Prix du bien (€)", 100000, 2000000, 300000, step=10000
         )
         apport = st.number_input("Apport initial (€)", 0, 1000000, 50000, step=5000)
-        taux_emprunt = st.slider("Taux emprunt (%)", 0.0, 10.0, 2.5, step=0.1) / 100
-        duree_credit = st.slider("Durée du crédit (ans)", 5, 30, 20)
-        frais_notaire = st.slider("Frais d'achat (%)", 0.0, 10.0, 7.5, step=0.1) / 100
+        taux_emprunt = (
+            st.number_input("Taux emprunt (%)", 0.0, 10.0, 2.5, step=0.1) / 100
+        )
+        duree_credit = st.number_input("Durée du crédit (ans)", 5, 30, 20)
+        frais_notaire = (
+            st.number_input("Frais d'achat (%)", 0.0, 10.0, 7.5, step=0.1) / 100
+        )
         entretien_annuel = st.number_input(
             "Frais annuels (entretien, taxes, etc.) (€)", 0, 10000, 2000
         )
         croissance_immo = (
-            st.slider("Croissance du marché immobilier (%)", -5.0, 10.0, 1.5, step=0.1)
+            st.number_input(
+                "Croissance du marché immobilier (%)", -5.0, 10.0, 1.5, step=0.1
+            )
             / 100
         )
 
     with col2:
         loyer_initial = st.number_input("Loyer mensuel (€)", 300, 5000, 1000, step=50)
         croissance_loyer = (
-            st.slider("Croissance annuelle du loyer (%)", 0.0, 5.0, 1.5, step=0.1) / 100
-        )
-        rendement_portefeuille = (
-            st.slider("Rendement des investissements (%)", 0.0, 10.0, 5.0, step=0.1)
+            st.number_input("Croissance annuelle du loyer (%)", 0.0, 5.0, 1.5, step=0.1)
             / 100
         )
-        duree_projection = st.slider("Durée de la projection (années)", 5, 40, 20)
+        rendement_portefeuille = (
+            st.number_input(
+                "Rendement des investissements (%)", 0.0, 10.0, 5.0, step=0.1
+            )
+            / 100
+        )
+        duree_projection = st.number_input("Durée de la projection (années)", 5, 40, 20)
 
     # Calculs initiaux
     montant_emprunte = prix_bien - apport
