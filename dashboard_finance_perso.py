@@ -14,14 +14,14 @@ def format_nombre(n):
     return f"{n:,.0f}".replace(",", " ")
 
 
-theme = theme_switcher()
+# theme = theme_switcher()
 
 
 # Configuration de la page
 st.set_page_config(page_title="Calculateurs Financiers", page_icon="💰", layout="wide")
 
 # Titre principal
-# st.title("💰 Calculateurs Financiers")
+st.title("💰 Calculateurs Financiers")
 st.markdown("Une suite d'outils pour planifier vos finances personnelles")
 
 st.markdown(
