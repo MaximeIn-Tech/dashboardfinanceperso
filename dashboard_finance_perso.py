@@ -1372,6 +1372,7 @@ with tab3:
             --primary-color: #FF4B4B;
             --text-color: #FAFAFA;
             --text-muted-color: rgba(250, 250, 250, 0.8);
+            --border-color: rgba(255, 255, 255, 0.1);
         }
     }
 
@@ -1382,7 +1383,8 @@ with tab3:
             --secondary-background-color: #f0f2f6;
             --primary-color: #FF4B4B;
             --text-color: #31333F;
-            --text-muted-color: rgba(30, 30, 30, 0.6); /* gris foncé mais doux */
+            --text-muted-color: rgba(30, 30, 30, 0.6);
+            --border-color: rgba(0, 0, 0, 0.1);
         }
     }
 
@@ -1391,7 +1393,7 @@ with tab3:
         border-radius: 12px;
         padding: 20px;
         margin: 15px 0;
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        border: 1px solid var(--border-color);
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
         transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
@@ -1444,13 +1446,13 @@ with tab3:
     }
 
     .conseil-description {
-        color: rgba(250, 250, 250, 0.8);
+        color: var(--text-muted-color);
         margin: 8px 0;
         line-height: 1.4;
     }
 
     .conseil-description-compact {
-        color: rgba(250, 250, 250, 0.8);
+        color: var(--text-muted-color);
         margin: 5px 0;
         font-size: 12px;
         line-height: 1.3;
@@ -1497,7 +1499,7 @@ with tab3:
     }
 
     .conseil-categorie {
-        color: rgba(250, 250, 250, 0.6);
+        color: var(--text-muted-color);
         font-style: italic;
         font-size: 12px;
         margin-top: 8px;
