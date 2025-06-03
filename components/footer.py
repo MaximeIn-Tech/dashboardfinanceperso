@@ -7,7 +7,6 @@ def render_footer():
     st.markdown("---")
 
     theme_base = st.get_option("theme.base")
-    st.write("Thème actuel :", theme_base)
 
     if theme_base == "dark":
         bg_color = "#0E1117"
