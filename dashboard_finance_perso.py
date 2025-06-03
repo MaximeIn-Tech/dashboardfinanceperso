@@ -1396,15 +1396,20 @@ input[type=number] {
     unsafe_allow_html=True,
 )
 
+
+def input_milliers(label, valeur_defaut):
+    valeur_str = st.text_input(label, f"{valeur_defaut:,}".replace(",", " "))
+    valeur_num = int(valeur_str.replace(" ", "").replace(",", ""))
+    return valeur_num
+
+
 with st.container():
     st.markdown("### 📋 Paramètres de la simulation")
     col1, col2 = st.columns(2)
 
     with col1:
         st.markdown("#### 🏡 Acheter")
-        prix_bien = st.number_input(
-            "Prix du bien (€)", 100000, 2000000, 300000, step=10000
-        )
+        prix_bien = input_milliers("Prix du bien (€)", 300000)
         apport = st.number_input("Apport initial (€)", 0, 1000000, 50000, step=5000)
         taux_emprunt = (
             st.number_input("Taux emprunt (%)", 0.0, 10.0, 2.5, step=0.1) / 100
