@@ -44,3 +44,9 @@ ou à me contacter directement :
 - 📬 Email: [maxime@maximeinetech.com](mailto:maxime@maximeinetech.com)
 - 🐙 GitHub: [@MaximeIn-Tech](https://github.com/MaximeIn-Tech)
 - 🧠 LinkedIn: [Maxime Hamou](https://www.linkedin.com/in/maximehamou/)
+
+## A faire :
+
+- Ajouter l'abattement de 10% automatique sur l'imposition.
+- Ajouter une possibilité d'extraire les résultats en PDF.
+- Ajout de certains simulateurs ?
