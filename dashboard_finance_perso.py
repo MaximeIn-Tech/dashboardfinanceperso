@@ -1087,16 +1087,16 @@ with tab3:
         st.subheader("⚙️ Paramètres")
         annee_fiscale = st.selectbox("Année fiscale", [2024, 2023], key="tmi_annee")
 
+        # Application de l'abattement de 10 % sur les revenus (plafonné à 13 522 € pour 2024)
+        plafond_abattement = 13522 if annee_fiscale == 2024 else 12912
+        abattement_10 = min(revenus_imposables * 0.10, plafond_abattement)
+        revenus_abattus = revenus_imposables - abattement_10
+
         st.info(f"📊 Nombre de parts fiscales : {nb_parts}")
         st.info(
             f"📉 Abattement de 10% appliqué : {abattement_10:,.0f} €\n\n"
             f"Revenus imposables après abattement : {revenus_abattus:,.0f} €"
         )
-
-    # Application de l'abattement de 10 % sur les revenus (plafonné à 13 522 € pour 2024)
-    plafond_abattement = 13522 if annee_fiscale == 2024 else 12912
-    abattement_10 = min(revenus_imposables * 0.10, plafond_abattement)
-    revenus_abattus = revenus_imposables - abattement_10
 
     # Barème 2024 (revenus 2023)
     if annee_fiscale == 2024:
