@@ -1403,43 +1403,119 @@ with st.container():
     with col1:
         st.markdown("#### 🏡 Acheter")
         prix_bien = st.number_input(
-            "Prix du bien (€)", 100000, 2000000, 300000, step=10000
+            "Prix du bien (€)",
+            100000,
+            2000000,
+            300000,
+            step=10000,
+            help="Prix d'achat du bien immobilier.",
         )
-        apport = st.number_input("Apport initial (€)", 0, 1000000, 50000, step=5000)
+        apport = st.number_input(
+            "Apport initial (€)",
+            0,
+            1000000,
+            50000,
+            step=5000,
+            help="Montant que vous apportez au départ, réduit le montant à emprunter.",
+        )
         taux_emprunt = (
-            st.number_input("Taux emprunt (%)", 0.0, 10.0, 2.5, step=0.1) / 100
+            st.number_input(
+                "Taux emprunt (%)",
+                0.0,
+                10.0,
+                2.5,
+                step=0.1,
+                help="Taux d'intérêt annuel du crédit immobilier.",
+            )
+            / 100
         )
-        duree_credit = st.number_input("Durée du crédit (ans)", 5, 30, 20)
+        duree_credit = st.number_input(
+            "Durée du crédit (ans)",
+            5,
+            30,
+            20,
+            help="Durée de remboursement du prêt immobilier.",
+        )
         frais_notaire = (
-            st.number_input("Frais d'achat (%)", 0.0, 10.0, 7.5, step=0.1) / 100
+            st.number_input(
+                "Frais d'achat (%)",
+                0.0,
+                10.0,
+                7.5,
+                step=0.1,
+                help="Frais de notaire et frais d'acquisition (% du prix du bien).",
+            )
+            / 100
         )
         entretien_annuel = st.number_input(
-            "Frais annuels (entretien, taxes, etc.) (€)", 0, 10000, 2000
+            "Frais annuels (entretien, taxes, etc.) (€)",
+            0,
+            10000,
+            2000,
+            help="Dépenses annuelles liées à l'entretien du bien, taxes, etc.",
         )
         croissance_immo = (
             st.number_input(
-                "Croissance du marché immobilier (%)", -5.0, 10.0, 1.5, step=0.1
+                "Croissance du marché immobilier (%)",
+                -5.0,
+                10.0,
+                1.5,
+                step=0.1,
+                help="Estimation de la croissance annuelle de la valeur du bien.",
             )
             / 100
         )
         frais_revente = (
-            st.number_input("Frais de revente (%)", 0.0, 10.0, 6.0, step=0.1) / 100
+            st.number_input(
+                "Frais de revente (%)",
+                0.0,
+                10.0,
+                6.0,
+                step=0.1,
+                help="Frais estimés lors de la revente du bien (agence, notaire, etc.).",
+            )
+            / 100
         )
 
     with col2:
         st.markdown("#### 🏠 Louer")
-        loyer_initial = st.number_input("Loyer mensuel (€)", 300, 5000, 1000, step=50)
+        loyer_initial = st.number_input(
+            "Loyer mensuel (€)",
+            300,
+            5000,
+            1000,
+            step=50,
+            help="Montant du loyer mensuel initial.",
+        )
         croissance_loyer = (
-            st.number_input("Croissance annuelle du loyer (%)", 0.0, 5.0, 1.5, step=0.1)
+            st.number_input(
+                "Croissance annuelle du loyer (%)",
+                0.0,
+                5.0,
+                1.5,
+                step=0.1,
+                help="Taux d'augmentation annuel du loyer.",
+            )
             / 100
         )
         rendement_portefeuille = (
             st.number_input(
-                "Rendement des investissements (%)", 0.0, 10.0, 5.0, step=0.1
+                "Rendement des investissements (%)",
+                0.0,
+                10.0,
+                5.0,
+                step=0.1,
+                help="Rendement annuel des investissements réalisés avec l'argent non utilisé pour acheter.",
             )
             / 100
         )
-        duree_projection = st.number_input("Durée de la projection (années)", 5, 40, 20)
+        duree_projection = st.number_input(
+            "Durée de la projection (années)",
+            5,
+            40,
+            20,
+            help="Nombre total d'années pour la comparaison entre l'achat et la location.",
+        )
 
     # Calculs initiaux
     montant_emprunte = prix_bien - apport
