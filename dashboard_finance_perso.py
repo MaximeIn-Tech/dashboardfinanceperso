@@ -1367,13 +1367,26 @@ with tab4:
         mensualite = montant * taux_mensuel / (1 - (1 + taux_mensuel) ** -n_mois)
         return mensualite
 
+    # Fonction pour calculer le solde restant du prêt année après année
+    def solde_restant_pret(montant, taux_annuel, duree_annees):
+        mensualite = calcul_mensualite_emprunt(montant, taux_annuel, duree_annees)
+        solde = montant
+        taux_mensuel = taux_annuel / 12
+        soldes_annuels = []
+        for annee in range(1, duree_annees + 1):
+            for _ in range(12):
+                interet = solde * taux_mensuel
+                principal = mensualite - interet
+                solde -= principal
+            soldes_annuels.append(max(solde, 0))
+        return soldes_annuels
+
     # Entrées utilisateur
     st.title("🏠 Simulateur Acheter vs Louer")
 
     col1, col2 = st.columns(2)
 
     with col1:
-        st.subheader("Achat")
         prix_bien = st.number_input(
             "Prix du bien (€)", 100000, 2000000, 300000, step=10000
         )
@@ -1394,9 +1407,11 @@ with tab4:
             )
             / 100
         )
+        frais_revente = (
+            st.number_input("Frais de revente (%)", 0.0, 10.0, 5.0, step=0.5) / 100
+        )
 
     with col2:
-        st.subheader("Location")
         loyer_initial = st.number_input("Loyer mensuel (€)", 300, 5000, 1000, step=50)
         croissance_loyer = (
             st.number_input("Croissance annuelle du loyer (%)", 0.0, 5.0, 1.5, step=0.1)
@@ -1417,67 +1432,94 @@ with tab4:
     )
     cout_initial_achat = apport + prix_bien * frais_notaire
 
+    # Solde du prêt chaque année
+    soldes_pret = solde_restant_pret(montant_emprunte, taux_emprunt, duree_credit)
+
     # Simulation année par année
     data = []
     loyer = loyer_initial
     valeur_bien = prix_bien
     portefeuille_loc = cout_initial_achat  # L'apport est investi
-    portefeuille_achat = 0
+    cash_acheteur = 0
 
     for annee in range(1, duree_projection + 1):
-        interets_annuels = mensualite_credit * 12 if annee <= duree_credit else 0
-        charges = entretien_annuel
         valeur_bien *= 1 + croissance_immo
-
-        cout_achat = interets_annuels + charges
-        cout_location = loyer * 12
-
-        # Simuler portefeuille locataire
-        surplus_annuel = (
-            interets_annuels - cout_location
-        )  # Ce qu'il peut investir en plus
-        portefeuille_loc *= 1 + rendement_portefeuille
-        portefeuille_loc += max(0, surplus_annuel)
-
-        # Simuler portefeuille acheteur (éventuellement à creuser)
-        portefeuille_achat += max(0, cout_location - interets_annuels)
-        portefeuille_achat *= 1 + rendement_portefeuille
-
         loyer *= 1 + croissance_loyer
+
+        cout_location = loyer * 12
+        paiement_annuel_credit = mensualite_credit * 12 if annee <= duree_credit else 0
+        interets_annuels = (
+            soldes_pret[annee - 1] * taux_emprunt if annee <= duree_credit else 0
+        )
+        capital_rembourse = (
+            paiement_annuel_credit - interets_annuels if annee <= duree_credit else 0
+        )
+
+        # Locataire : investit la différence entre mensualité crédit et loyer
+        surplus_annuel = max(0, paiement_annuel_credit - cout_location)
+        portefeuille_loc *= 1 + rendement_portefeuille
+        portefeuille_loc += surplus_annuel
+
+        # Acheteur : simule les liquidités restantes (ex. économies faites vs location)
+        epargne_equivalente = max(0, cout_location - paiement_annuel_credit)
+        cash_acheteur += epargne_equivalente
+        cash_acheteur *= 1 + rendement_portefeuille
+
+        # Solde du prêt
+        solde_emprunt = soldes_pret[annee - 1] if annee <= duree_credit else 0
+        valeur_nette_acheteur = (
+            valeur_bien * (1 - frais_revente) - solde_emprunt + cash_acheteur
+        )
 
         data.append(
             {
                 "Année": annee,
-                "Cout Achat Cumulé (€)": cout_achat * annee,
-                "Cout Location Cumulé (€)": cout_location * annee,
                 "Valeur Bien (€)": valeur_bien,
+                "Solde Emprunt (€)": solde_emprunt,
+                "Cash Acheteur (€)": cash_acheteur,
+                "Valeur Nette Acheteur (€)": valeur_nette_acheteur,
                 "Portefeuille Locataire (€)": portefeuille_loc,
-                "Portefeuille Acheteur (€)": portefeuille_achat,
+                "Loyer (€)": loyer,
             }
         )
 
     # Affichage
-    st.subheader("📈 Résultats")
+    st.subheader("📈 Comparaison visuelle")
     df = pd.DataFrame(data)
-    st.line_chart(
-        df.set_index("Année")[
-            [
-                "Cout Achat Cumulé (€)",
-                "Cout Location Cumulé (€)",
-                "Portefeuille Locataire (€)",
-                "Valeur Bien (€)",
-            ]
-        ]
+
+    fig = go.Figure()
+    fig.add_trace(
+        go.Scatter(
+            x=df["Année"],
+            y=df["Portefeuille Locataire (€)"],
+            mode="lines+markers",
+            name="💼 Portefeuille Locataire",
+        )
     )
+    fig.add_trace(
+        go.Scatter(
+            x=df["Année"],
+            y=df["Valeur Nette Acheteur (€)"],
+            mode="lines+markers",
+            name="🏡 Valeur Nette Acheteur",
+        )
+    )
+    fig.update_layout(
+        title="Évolution du patrimoine net - Acheter vs Louer",
+        xaxis_title="Année",
+        yaxis_title="Montant (€)",
+        template="plotly_white",
+    )
+    st.plotly_chart(fig, use_container_width=True)
 
     st.dataframe(df, use_container_width=True)
 
     st.markdown(
         """
     **💡 Interprétation :**
-    - Le coût cumulé est l'argent "sorti de ta poche" dans chaque scénario.
-    - Le portefeuille locataire est basé sur l'investissement de l'apport et des mensualités économisées.
-    - Le bien acheté prend de la valeur avec le temps, mais a un coût d'entretien.
+    - Le portefeuille du locataire représente l'argent investi de façon autonome.
+    - La valeur nette de l'acheteur inclut la plus-value du bien, le remboursement du crédit et le cash épargné.
+    - Les frais de revente sont pris en compte pour un scénario plus réaliste.
     """
     )
 
