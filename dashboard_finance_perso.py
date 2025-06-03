@@ -1382,7 +1382,7 @@ with tab4:
         return soldes_annuels
 
     # Entrées utilisateur
-    st.title("🏠 Simulateur Acheter vs Louer")
+    st.header("🏠 Simulateur Acheter vs Louer")
 
     st.markdown(
         """
