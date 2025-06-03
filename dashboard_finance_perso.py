@@ -1356,196 +1356,198 @@ with tab3:
         else:
             st.info("Aucune donnée de tranche disponible")
 
-    # Conseils d'optimisation fiscale
-st.subheader("💡 Conseils d'optimisation fiscale")
+        # Conseils d'optimisation fiscale
+    st.subheader("💡 Conseils d'optimisation fiscale")
 
-# Créer les conseils avec catégories et priorités
-conseils_data = []
+    # Créer les conseils avec catégories et priorités
+    conseils_data = []
 
-if tmi >= 30:
+    if tmi >= 30:
+        conseils_data.append(
+            {
+                "titre": "Plan d'Épargne en Actions (PEA)",
+                "emoji": "🏦",
+                "description": "Optimisez vos investissements avec un PEA",
+                "avantage": "Exonéré d'impôt après 5 ans",
+                "priorite": "Élevée",
+                "categorie": "Épargne & Investissement",
+            }
+        )
+
     conseils_data.append(
         {
-            "titre": "Plan d'Épargne en Actions (PEA)",
-            "emoji": "🏦",
-            "description": "Optimisez vos investissements avec un PEA",
-            "avantage": "Exonéré d'impôt après 5 ans",
+            "titre": "Assurance-vie",
+            "emoji": "🏠",
+            "description": "Profitez de l'abattement fiscal",
+            "avantage": "4 600€/an d'abattement après 8 ans",
             "priorite": "Élevée",
             "categorie": "Épargne & Investissement",
         }
     )
 
-conseils_data.append(
-    {
-        "titre": "Assurance-vie",
-        "emoji": "🏠",
-        "description": "Profitez de l'abattement fiscal",
-        "avantage": "4 600€/an d'abattement après 8 ans",
-        "priorite": "Élevée",
-        "categorie": "Épargne & Investissement",
-    }
-)
+    if tmi >= 41:
+        conseils_data.append(
+            {
+                "titre": "Plan d'Épargne Retraite (PER)",
+                "emoji": "📊",
+                "description": "Déduction fiscale sur vos revenus",
+                "avantage": "Jusqu'à 10% de vos revenus déductibles",
+                "priorite": "Très élevée",
+                "categorie": "Retraite & Défiscalisation",
+            }
+        )
 
-if tmi >= 41:
-    conseils_data.append(
-        {
-            "titre": "Plan d'Épargne Retraite (PER)",
-            "emoji": "📊",
-            "description": "Déduction fiscale sur vos revenus",
-            "avantage": "Jusqu'à 10% de vos revenus déductibles",
-            "priorite": "Très élevée",
-            "categorie": "Retraite & Défiscalisation",
+        conseils_data.append(
+            {
+                "titre": "Investissement locatif",
+                "emoji": "🏡",
+                "description": "Déficit foncier déductible",
+                "avantage": "Réduction d'impôt par déficit foncier",
+                "priorite": "Moyenne",
+                "categorie": "Immobilier",
+            }
+        )
+
+    if revenus_imposables > 50000:
+        conseils_data.append(
+            {
+                "titre": "Dons aux associations",
+                "emoji": "🎯",
+                "description": "Soutenez des causes tout en réduisant vos impôts",
+                "avantage": "66% de réduction d'impôt",
+                "priorite": "Moyenne",
+                "categorie": "Solidarité",
+            }
+        )
+
+        conseils_data.append(
+            {
+                "titre": "FCPI/FIP",
+                "emoji": "💼",
+                "description": "Investissement dans l'innovation",
+                "avantage": "18% de réduction d'impôt",
+                "priorite": "Faible",
+                "categorie": "Investissement à risque",
+            }
+        )
+
+    if situation_familiale == "Célibataire":
+        conseils_data.append(
+            {
+                "titre": "PACS ou Mariage",
+                "emoji": "💑",
+                "description": "Optimisation fiscale selon les revenus du conjoint",
+                "avantage": "Possible réduction selon situation",
+                "priorite": "Variable",
+                "categorie": "Situation familiale",
+            }
+        )
+
+    # Affichage moderne des conseils
+    if conseils_data:
+        # Grouper par priorité
+        priorites = {
+            "Très élevée": {"conseils": [], "color": "#ff4757", "icon": "🔥"},
+            "Élevée": {"conseils": [], "color": "#ff6b35", "icon": "⭐"},
+            "Moyenne": {"conseils": [], "color": "#ffa502", "icon": "💡"},
+            "Faible": {"conseils": [], "color": "#70a1ff", "icon": "💭"},
+            "Variable": {"conseils": [], "color": "#a4b0be", "icon": "🤔"},
         }
-    )
 
-    conseils_data.append(
-        {
-            "titre": "Investissement locatif",
-            "emoji": "🏡",
-            "description": "Déficit foncier déductible",
-            "avantage": "Réduction d'impôt par déficit foncier",
-            "priorite": "Moyenne",
-            "categorie": "Immobilier",
-        }
-    )
+        for conseil in conseils_data:
+            priorites[conseil["priorite"]]["conseils"].append(conseil)
 
-if revenus_imposables > 50000:
-    conseils_data.append(
-        {
-            "titre": "Dons aux associations",
-            "emoji": "🎯",
-            "description": "Soutenez des causes tout en réduisant vos impôts",
-            "avantage": "66% de réduction d'impôt",
-            "priorite": "Moyenne",
-            "categorie": "Solidarité",
-        }
-    )
+        # Afficher par ordre de priorité
+        for priorite, data in priorites.items():
+            if data["conseils"]:
+                st.markdown(
+                    f"""
+                <div style="margin: 20px 0;">
+                    <h4 style="color: {data['color']}; margin-bottom: 15px;">
+                        {data['icon']} Priorité {priorite}
+                    </h4>
+                </div>
+                """,
+                    unsafe_allow_html=True,
+                )
 
-    conseils_data.append(
-        {
-            "titre": "FCPI/FIP",
-            "emoji": "💼",
-            "description": "Investissement dans l'innovation",
-            "avantage": "18% de réduction d'impôt",
-            "priorite": "Faible",
-            "categorie": "Investissement à risque",
-        }
-    )
-
-if situation_familiale == "Célibataire":
-    conseils_data.append(
-        {
-            "titre": "PACS ou Mariage",
-            "emoji": "💑",
-            "description": "Optimisation fiscale selon les revenus du conjoint",
-            "avantage": "Possible réduction selon situation",
-            "priorite": "Variable",
-            "categorie": "Situation familiale",
-        }
-    )
-
-# Affichage moderne des conseils
-if conseils_data:
-    # Grouper par priorité
-    priorites = {
-        "Très élevée": {"conseils": [], "color": "#ff4757", "icon": "🔥"},
-        "Élevée": {"conseils": [], "color": "#ff6b35", "icon": "⭐"},
-        "Moyenne": {"conseils": [], "color": "#ffa502", "icon": "💡"},
-        "Faible": {"conseils": [], "color": "#70a1ff", "icon": "💭"},
-        "Variable": {"conseils": [], "color": "#a4b0be", "icon": "🤔"},
-    }
-
-    for conseil in conseils_data:
-        priorites[conseil["priorite"]]["conseils"].append(conseil)
-
-    # Afficher par ordre de priorité
-    for priorite, data in priorites.items():
-        if data["conseils"]:
-            st.markdown(
-                f"""
-            <div style="margin: 20px 0;">
-                <h4 style="color: {data['color']}; margin-bottom: 15px;">
-                    {data['icon']} Priorité {priorite}
-                </h4>
-            </div>
-            """,
-                unsafe_allow_html=True,
-            )
-
-            # Créer des colonnes pour les conseils de même priorité
-            if len(data["conseils"]) == 1:
-                conseil = data["conseils"][0]
-                with st.container():
-                    st.markdown(
-                        f"""
-                    <div style="
-                        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-                        border-left: 4px solid {data['color']};
-                        border-radius: 8px;
-                        padding: 20px;
-                        margin: 10px 0;
-                        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-                    ">
-                        <div style="display: flex; align-items: center; margin-bottom: 10px;">
-                            <span style="font-size: 24px; margin-right: 12px;">{conseil['emoji']}</span>
-                            <h5 style="margin: 0; color: #2c3e50;">{conseil['titre']}</h5>
-                        </div>
-                        <p style="margin: 8px 0; color: #495057;">{conseil['description']}</p>
-                        <div style="
-                            background: {data['color']}20;
-                            border-radius: 6px;
-                            padding: 8px 12px;
-                            margin-top: 10px;
-                        ">
-                            <strong style="color: {data['color']};">💰 {conseil['avantage']}</strong>
-                        </div>
-                        <small style="color: #6c757d; font-style: italic;">
-                            📂 {conseil['categorie']}
-                        </small>
-                    </div>
-                    """,
-                        unsafe_allow_html=True,
-                    )
-            else:
-                # Afficher en colonnes si plusieurs conseils
-                cols = st.columns(min(len(data["conseils"]), 2))
-                for i, conseil in enumerate(data["conseils"]):
-                    with cols[i % 2]:
+                # Créer des colonnes pour les conseils de même priorité
+                if len(data["conseils"]) == 1:
+                    conseil = data["conseils"][0]
+                    with st.container():
                         st.markdown(
                             f"""
                         <div style="
                             background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
                             border-left: 4px solid {data['color']};
                             border-radius: 8px;
-                            padding: 15px;
+                            padding: 20px;
                             margin: 10px 0;
                             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-                            height: 180px;
-                            display: flex;
-                            flex-direction: column;
                         ">
-                            <div style="display: flex; align-items: center; margin-bottom: 8px;">
-                                <span style="font-size: 20px; margin-right: 8px;">{conseil['emoji']}</span>
-                                <h6 style="margin: 0; color: #2c3e50; font-size: 14px;">{conseil['titre']}</h6>
+                            <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                                <span style="font-size: 24px; margin-right: 12px;">{conseil['emoji']}</span>
+                                <h5 style="margin: 0; color: #2c3e50;">{conseil['titre']}</h5>
                             </div>
-                            <p style="margin: 5px 0; color: #495057; font-size: 12px; flex-grow: 1;">
-                                {conseil['description']}
-                            </p>
+                            <p style="margin: 8px 0; color: #495057;">{conseil['description']}</p>
                             <div style="
                                 background: {data['color']}20;
-                                border-radius: 4px;
-                                padding: 6px 8px;
-                                margin-top: auto;
+                                border-radius: 6px;
+                                padding: 8px 12px;
+                                margin-top: 10px;
                             ">
-                                <strong style="color: {data['color']}; font-size: 11px;">
-                                    💰 {conseil['avantage']}
-                                </strong>
+                                <strong style="color: {data['color']};">💰 {conseil['avantage']}</strong>
                             </div>
+                            <small style="color: #6c757d; font-style: italic;">
+                                📂 {conseil['categorie']}
+                            </small>
                         </div>
                         """,
                             unsafe_allow_html=True,
                         )
-else:
-    st.info("Aucun conseil d'optimisation spécifique pour votre situation actuelle.")
+                else:
+                    # Afficher en colonnes si plusieurs conseils
+                    cols = st.columns(min(len(data["conseils"]), 2))
+                    for i, conseil in enumerate(data["conseils"]):
+                        with cols[i % 2]:
+                            st.markdown(
+                                f"""
+                            <div style="
+                                background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+                                border-left: 4px solid {data['color']};
+                                border-radius: 8px;
+                                padding: 15px;
+                                margin: 10px 0;
+                                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                                height: 180px;
+                                display: flex;
+                                flex-direction: column;
+                            ">
+                                <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                                    <span style="font-size: 20px; margin-right: 8px;">{conseil['emoji']}</span>
+                                    <h6 style="margin: 0; color: #2c3e50; font-size: 14px;">{conseil['titre']}</h6>
+                                </div>
+                                <p style="margin: 5px 0; color: #495057; font-size: 12px; flex-grow: 1;">
+                                    {conseil['description']}
+                                </p>
+                                <div style="
+                                    background: {data['color']}20;
+                                    border-radius: 4px;
+                                    padding: 6px 8px;
+                                    margin-top: auto;
+                                ">
+                                    <strong style="color: {data['color']}; font-size: 11px;">
+                                        💰 {conseil['avantage']}
+                                    </strong>
+                                </div>
+                            </div>
+                            """,
+                                unsafe_allow_html=True,
+                            )
+    else:
+        st.info(
+            "Aucun conseil d'optimisation spécifique pour votre situation actuelle."
+        )
 
 # ============= ONGLET 4: ACHETER VS LOUER =============
 
