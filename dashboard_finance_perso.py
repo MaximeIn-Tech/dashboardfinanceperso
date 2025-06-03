@@ -1523,6 +1523,7 @@ with tab4:
             label="🔍 Différence Relative",
             value="Acheteur > Locataire" if diff_pct > 0 else "Locataire > Acheteur",
             delta=delta_str,
+            delta_color="inverse",
         )
 
     fig = go.Figure()
