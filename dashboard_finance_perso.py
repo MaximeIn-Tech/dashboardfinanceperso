@@ -1380,7 +1380,7 @@ with tab3:
             --background-color: #FFFFFF;
             --secondary-background-color: #f0f2f6;
             --primary-color: #FF4B4B;
-            --text-color: #0E1117;
+            --text-color: #31333F;
         }
     }
 
