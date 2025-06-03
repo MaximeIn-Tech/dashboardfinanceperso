@@ -15,7 +15,7 @@ def render_footer():
     else:
         bg_color = "#e3f2fd"
         border_color = "#2196f3"
-        text_color = "#1976d2"
+        text_color = "#F0F2F6"
 
         # Note finale avec style adaptatif
         st.markdown(
