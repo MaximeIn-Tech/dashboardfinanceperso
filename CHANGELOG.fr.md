@@ -14,6 +14,7 @@ Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/)
 
 ### Changed
 
+- Contenu du footer sur la phrase.
 - Contenu du `README.md` mis à jour.
 - Ajouts de styles dans `assets/styles.css`.
 

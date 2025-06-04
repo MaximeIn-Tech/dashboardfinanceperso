@@ -21,7 +21,7 @@ def render_footer():
                 📋 Note importante
             </h5>
             <p class="note-texte">
-                Ces conseils sont donnés à titre indicatif.
+                Ces informations sont données à titre indicatif.
                 Consultez un conseiller fiscal pour une stratégie personnalisée.
             </p>
         </div>
