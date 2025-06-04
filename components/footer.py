@@ -1,6 +1,13 @@
 import streamlit as st
 from streamlit_extras.add_vertical_space import add_vertical_space
 
+# Charge le fichier CSS au lancement
+with open("assets/styles.css") as f:
+    css = f.read()
+
+# Injecte le CSS dans la page Streamlit (une seule fois, en haut de ton app ou dans une fonction d'init)
+st.markdown(f"<style>{css}</style>", unsafe_allow_html=True)
+
 
 def render_footer():
     add_vertical_space(3)
@@ -9,64 +16,22 @@ def render_footer():
     # Note finale avec style adaptatif
     st.markdown(
         """
-        <style>
-        .note-titre {
-            color: #FAFAFA !important; /* Couleur fixe sombre */
-            margin-bottom: 10px;
-            font-size: 50px;
-            font-weight: 600;
-        }
-
-        .note-finale {
-            background: var(--secondary-background-color);
-            border: 1px solid var(--primary-color);
-            border-radius: 12px;
-            padding: 20px;
-            margin: 30px 0;
-            text-align: center;
-        }
-
-        .note-texte {
-            color: #FAFAFA !important;
-            margin: 0;
-            font-style: italic;
-        }
-        </style>
-
-    <div class="note-finale">
-        <h5 class="note-titre">
-            📋 Note importante
-        </h5>
-        <p class="note-texte">
-            Ces conseils sont donnés à titre indicatif.
-            Consultez un conseiller fiscal pour une stratégie personnalisée.
-        </p>
-    </div>
-    """,
+        <div class="note-finale">
+            <h5 class="note-titre">
+                📋 Note importante
+            </h5>
+            <p class="note-texte">
+                Ces conseils sont donnés à titre indicatif.
+                Consultez un conseiller fiscal pour une stratégie personnalisée.
+            </p>
+        </div>
+        """,
         unsafe_allow_html=True,
     )
 
     # Footer HTML avec logos
     st.markdown(
         """
-        <style>
-        .footer-container {
-            text-align: center;
-            color: gray;
-            font-size: 13px;
-            margin-top: 20px;
-        }
-        .footer-container img {
-            margin: 0 10px;
-            width: 26px;
-            vertical-align: middle;
-            transition: transform 0.2s ease;
-        }
-        .footer-container img:hover {
-            transform: scale(1.2);
-        }
-        </style>
-
         <div class="footer-container">
             <p>❤️ Ce site a été créé avec amour par <strong>Maxime</strong></p>
             <a href="https://github.com/MaximeIn-Tech" target="_blank">

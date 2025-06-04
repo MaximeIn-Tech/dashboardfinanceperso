@@ -2,6 +2,8 @@
 
 👉 [🇫🇷 Lire en français](./README.fr.md)
 
+📄 [Changelog](./CHANGELOG.en.md)
+
 To use the dashboard: [https://dashboardfinanceperso.streamlit.app/](https://dashboardfinanceperso.streamlit.app/)
 
 ## Tech Stack

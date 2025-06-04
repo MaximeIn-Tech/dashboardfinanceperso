@@ -1,1 +1,9 @@
+[server]
+# Active le rechargement automatique sur sauvegarde
+runOnSave = true
 
+# Port par défaut (optionnel)
+port = 8501
+
+# Permet l'accès depuis d'autres machines (optionnel)
+address = "0.0.0.0"

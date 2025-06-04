@@ -5,8 +5,12 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 import streamlit as st
+from plotly.subplots import make_subplots
 
 from components.footer import render_footer
+
+with open("assets/styles.css") as f:
+    css = f.read()
 
 
 def format_nombre(n):
@@ -30,12 +34,13 @@ st.markdown(
 st.markdown("---")
 
 # Création des onglets
-tab1, tab2, tab3, tab4 = st.tabs(
+tab1, tab2, tab3, tab4, tab5 = st.tabs(
     [
         "🏦 Intérêts Composés",
         "🔥 Calculateur FI/RE",
         "🧮 Calculateur d'Impôts",
         "🏠 Acheter VS Louer",
+        "🏦 Simulateur de prêt immobilier",
     ]
 )
 
@@ -1361,160 +1366,7 @@ with tab3:
     st.subheader("💡 Conseils d'optimisation fiscale")
 
     # CSS personnalisé qui utilise automatiquement les variables CSS de Streamlit
-    st.markdown(
-        """
-    <style>
-    /* Thème sombre */
-    @media (prefers-color-scheme: dark) {
-        :root {
-            --background-color: #0E1117;
-            --secondary-background-color: #262730;
-            --primary-color: #FF4B4B;
-            --text-color: #FAFAFA;
-            --text-muted-color: rgba(250, 250, 250, 0.8);
-            --border-color: rgba(255, 255, 255, 0.1);
-        }
-    }
-
-    /* Thème clair */
-    @media (prefers-color-scheme: light) {
-        :root {
-            --background-color: #FFFFFF;
-            --secondary-background-color: #f0f2f6;
-            --primary-color: #FF4B4B;
-            --text-color: #FFFFFF;
-            --text-muted-color: rgba(30, 30, 30, 0.6);
-            --border-color: rgba(0, 0, 0, 0.1);
-        }
-    }
-
-
-    .conseil-card {
-        background: var(--secondary-background-color);
-        border-radius: 12px;
-        padding: 20px;
-        margin: 15px 0;
-        border: 1px solid var(--border-color);
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    .conseil-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 12px rgba(0, 0, 0, 0.4);
-    }
-
-    .conseil-card-compact {
-        background: var(--secondary-background-color);
-        border-radius: 12px;
-        padding: 15px;
-        margin: 10px 0;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-        height: 200px;
-        display: flex;
-        flex-direction: column;
-        transition: transform 0.2s ease;
-    }
-
-    .conseil-card-compact:hover {
-        transform: translateY(-2px);
-    }
-
-    .conseil-header {
-        display: flex;
-        align-items: center;
-        margin-bottom: 12px;
-    }
-
-    .conseil-emoji {
-        font-size: 24px;
-        margin-right: 12px;
-    }
-
-    .conseil-title {
-        margin: 0;
-        color: #FAFAFA !important;
-        font-size: 16px;
-        font-weight: 600;
-    }
-
-    .conseil-title-compact {
-        margin: 0;
-        color: #FAFAFA !important;
-        font-size: 14px;
-        font-weight: 600;
-    }
-
-    .conseil-description {
-        color: #FAFAFA !important;
-        margin: 8px 0;
-        line-height: 1.4;
-    }
-
-    .conseil-description-compact {
-        color: #FAFAFA !important;
-        margin: 5px 0;
-        font-size: 18px !important;
-        line-height: 1.3;
-        flex-grow: 1;
-    }
-
-    .conseil-avantage {
-        color: #FAFAFA !important;
-        border-radius: 8px;
-        padding: 10px 12px;
-        margin-top: 12px;
-        font-weight: 600;
-        font-size: 13px;
-    }
-
-    .conseil-avantage-compact {
-        color: #FAFAFA !important;
-        border-radius: 6px;
-        padding: 8px;
-        margin-top: auto;
-        font-weight: 600;
-        font-size: 14px;
-    }
-
-    .conseil-categorie {
-        color: #FAFAFA !important;
-        font-style: italic;
-        font-size: 14px;
-        margin-top: 8px;
-    }
-
-    .priorite-header {
-        margin: 25px 0 15px 0;
-        font-size: 18px;
-        font-weight: 600;
-        display: flex;
-        align-items: center;
-    }
-
-    /* Couleurs spécifiques pour chaque priorité */
-    .priorite-tres-elevee { color: #ff4757; }
-    .priorite-elevee { color: #ff6b35; }
-    .priorite-moyenne { color: #ffa502; }
-    .priorite-faible { color: #70a1ff; }
-    .priorite-variable { color: #a4b0be; }
-
-    .border-tres-elevee { border-left: 4px solid #ff4757; }
-    .border-elevee { border-left: 4px solid #ff6b35; }
-    .border-moyenne { border-left: 4px solid #ffa502; }
-    .border-faible { border-left: 4px solid #70a1ff; }
-    .border-variable { border-left: 4px solid #a4b0be; }
-
-    .bg-tres-elevee { background: rgba(255, 71, 87, 0.15); }
-    .bg-elevee { background: rgba(255, 107, 53, 0.15); }
-    .bg-moyenne { background: rgba(255, 165, 2, 0.15); }
-    .bg-faible { background: rgba(112, 161, 255, 0.15); }
-    .bg-variable { background: rgba(164, 176, 190, 0.15); }
-    </style>
-    """,
-        unsafe_allow_html=True,
-    )
+    st.markdown(f"<style>{css}</style>", unsafe_allow_html=True)
 
     # Créer les conseils avec catégories et priorités
     conseils_data = []
@@ -2014,6 +1866,241 @@ with tab4:
         - La valeur nette acheteur tient compte de la revente du bien (avec frais) et du capital remboursé.
         - La ligne rouge verticale indique l'année où louer devient plus rentable qu'acheter (si applicable).
         """
+        )
+
+with tab5:
+
+    st.header("🏠 Simulateur de Prêt Immobilier")
+
+    # Interface d'entrée avec colonnes
+    col1, col2, col3 = st.columns(3)
+
+    with col1:
+        st.markdown("### 💰 Montant du prêt")
+        montant = st.number_input(
+            "Montant emprunté (€)",
+            min_value=1000,
+            max_value=2_000_000,
+            value=250_000,
+            step=1_000,
+            help="Rentrez le montant que vous souhaitez emprunter.",
+        )
+
+    with col2:
+        st.markdown("### 📅 Durée du prêt")
+        duree_annees = st.number_input(
+            "Durée du prêt (années)",
+            min_value=5,
+            max_value=30,
+            value=20,
+            step=1,
+            help="Rentrez le nombre d'années de votre prêt.",
+        )
+
+    with col3:
+        st.markdown("### 📈 Taux d'intérêt")
+        taeg = st.number_input(
+            "TAEG (%)",
+            min_value=0.1,
+            max_value=10.0,
+            value=2.5,
+            step=0.1,
+            help=(
+                "Le TAEG (Taux Annuel Effectif Global) inclut **tous les frais** du crédit : "
+                "taux nominal, assurance, frais de dossier, etc. "
+                "C'est le meilleur indicateur pour comparer les offres entre elles."
+            ),
+        )
+
+    st.markdown("---")
+
+    # Calculs
+    mois = duree_annees * 12
+    taux_mensuel = taeg / 100 / 12
+    if taux_mensuel > 0:
+        mensualite = montant * (taux_mensuel / (1 - (1 + taux_mensuel) ** -mois))
+    else:
+        mensualite = montant / mois
+
+    # Construction du tableau d'amortissement
+    data = []
+    capital_restant = montant
+    cumul_interets = 0
+    cumul_capital = 0
+
+    for i in range(0, mois + 1):
+        if i == 0:
+            data.append(
+                {
+                    "Mois": i,
+                    "Année": 0,
+                    "Mensualité": 0,
+                    "Intérêts": 0,
+                    "Capital": 0,
+                    "Cumul_Interets": 0,
+                    "Cumul_Capital": 0,
+                    "Capital_Restant": round(capital_restant, 2),
+                }
+            )
+        else:
+            interet = round(capital_restant * taux_mensuel, 2)
+
+            # Dernier mois : on ajuste pour solder le capital restant
+            if i == mois:
+                capital = capital_restant
+                mensualite = round(capital + interet, 2)
+            else:
+                capital = round(mensualite - interet, 2)
+
+            capital_restant = round(max(0, capital_restant - capital), 2)
+            cumul_interets = round(cumul_interets + interet, 2)
+            cumul_capital = round(cumul_capital + capital, 2)
+
+            data.append(
+                {
+                    "Mois": i,
+                    "Année": (i - 1) // 12 + 1,
+                    "Mensualité": mensualite,
+                    "Intérêts": interet,
+                    "Capital": capital,
+                    "Cumul_Interets": cumul_interets,
+                    "Cumul_Capital": cumul_capital,
+                    "Capital_Restant": capital_restant,
+                }
+            )
+
+    df = pd.DataFrame(data)
+
+    # Métriques principales
+    total_interets = df["Cumul_Interets"].iloc[-1]
+    total_rembourse = mensualite * mois
+    ratio_interet = total_interets / montant
+
+    # Affichage des métriques avec des couleurs
+    col1, col2, col3, col4 = st.columns(4)
+
+    with col1:
+        st.metric(
+            "🏦 Montant emprunté",
+            f"{format_nombre(montant)} €",
+            help="Capital initial emprunté",
+        )
+
+    with col2:
+        st.metric(
+            "💸 Mensualité",
+            f"{mensualite:,.0f}".replace(",", " ") + " €",
+            help="Montant à payer chaque mois",
+        )
+
+    with col3:
+        st.metric(
+            "📈 Intérêts totaux",
+            f"{format_nombre(total_interets)} €",
+            delta=f"{ratio_interet:.1%} du capital",
+            help="Total des intérêts sur toute la durée",
+        )
+
+    with col4:
+        st.metric(
+            "💰 Coût total",
+            f"{format_nombre(total_rembourse)} €",
+            help="Montant total remboursé",
+        )
+
+    # Indicateur de qualité du taux
+    if ratio_interet < 0.15:
+        st.success("🎉 **Excellent taux !** Votre prêt est très avantageux.")
+    elif ratio_interet < 0.35:
+        st.warning("⚡ **Taux correct.** Dans la moyenne du marché.")
+    else:
+        st.error("🔥 **Attention !** Ce prêt est coûteux en intérêts.")
+
+    st.markdown("---")
+
+    df = df.rename(
+        columns={
+            "Mensualité": "Mensualité (€)",
+            "Intérêts": "Intérêts (€)",
+            "Capital": "Capital Remboursé (€)",
+            "Cumul_Interets": "Cumul Intérêts (€)",
+            "Cumul_Capital": "Cumul Capital (€)",
+            "Capital_Restant": "Capital Restant (€)",
+        }
+    )
+
+    # Création des tabs
+    tabs = st.tabs(["Graphiques", "Tableau complet", "Résumé par année"])
+
+    with tabs[0]:
+        fig = go.Figure()
+
+        # Montant total payé (mensualités cumulées)
+        fig.add_trace(
+            go.Scatter(
+                x=df["Mois"],
+                y=df["Mensualité (€)"].cumsum(),
+                name="Total Remboursé (€)",
+                line=dict(color="blue"),
+            )
+        )
+
+        # Capital réellement remboursé
+        fig.add_trace(
+            go.Scatter(
+                x=df["Mois"],
+                y=df["Cumul Capital (€)"],
+                name="Création de Patrimoine (€)",
+                line=dict(color="green"),
+            )
+        )
+
+        # Intérêts cumulés
+        fig.add_trace(
+            go.Scatter(
+                x=df["Mois"],
+                y=df["Cumul Intérêts (€)"],
+                name="Coût des Intérêts (€)",
+                line=dict(color="red", dash="dot"),
+            )
+        )
+
+        fig.update_layout(
+            title="Impact des Intérêts sur la Création de Patrimoine",
+            xaxis_title="Mois",
+            yaxis_title="Montant (€)",
+            hovermode="x unified",
+            template="plotly_white",
+            height=550,
+            legend=dict(x=0.02, y=0.98),
+        )
+
+        st.plotly_chart(fig, use_container_width=True)
+
+    with tabs[1]:
+        st.subheader("Tableau d'amortissement complet")
+        st.dataframe(
+            df.style.format("{:.2f}"), hide_index=True, use_container_width=True
+        )
+
+    with tabs[2]:
+        st.subheader("Résumé annuel")
+        df_annual = (
+            df.groupby("Année")
+            .agg(
+                {
+                    "Mensualité (€)": "mean",
+                    "Intérêts (€)": "sum",
+                    "Capital Remboursé (€)": "sum",
+                    "Cumul Intérêts (€)": "max",
+                    "Cumul Capital (€)": "max",
+                    "Capital Restant (€)": "min",
+                }
+            )
+            .reset_index()
+        )
+        st.dataframe(
+            df_annual.style.format("{:.2f}"), hide_index=True, use_container_width=True
         )
 
 

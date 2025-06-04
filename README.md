@@ -2,6 +2,8 @@
 
 👉 [🏴󠁧󠁢󠁥󠁮󠁧󠁿 Read in english](./README.en.md)
 
+📄 [Journal des modifications](./CHANGELOG.fr.md)
+
 Pour utiliser le dashboard : [https://dashboardfinanceperso.streamlit.app/](https://dashboardfinanceperso.streamlit.app/)
 
 ## Outils utilisés :
