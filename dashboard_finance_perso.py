@@ -9,6 +9,9 @@ from plotly.subplots import make_subplots
 
 from components.footer import render_footer
 
+# Configuration de la page
+st.set_page_config(page_title="Calculateurs Financiers", page_icon="💰", layout="wide")
+
 with open("assets/styles.css") as f:
     css = f.read()
 
@@ -16,9 +19,6 @@ with open("assets/styles.css") as f:
 def format_nombre(n):
     return f"{n:,.0f}".replace(",", " ")
 
-
-# Configuration de la page
-st.set_page_config(page_title="Calculateurs Financiers", page_icon="💰", layout="wide")
 
 # Titre principal
 st.title("💰 Calculateurs Financiers")
