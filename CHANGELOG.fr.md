@@ -8,23 +8,27 @@ Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/)
 
 ## 2025-06-04
 
-### Ajouté
+### Added
 
 - Nouvelle tab sur le calculateur de prêt immobilier.
 
-### Modifié
+### Changed
 
 - Contenu du `README.md` mis à jour.
 - Ajouts de styles dans `assets/styles.css`.
 
+### Removed
+
+- Les marqueurs sur les lignes de achat vs location sont enlevées.
+
 ## 2025-06-03
 
-### Ajouté
+### Added
 
 - Nouveau composant `footer.py` dans `components/`.
 - Fichier CSS global `assets/styles.css`.
 
-### Modifié
+### Changed
 
 - Contenu du `README.md` mis à jour.
 
@@ -32,7 +36,7 @@ Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/)
 
 ## 2025-05-30
 
-### Ajouté
+### Added
 
 - Première version du tableau de bord `dashboard_finance_perso.py`.
 - Fichier `requirements.txt` ajouté.

@@ -1810,10 +1810,9 @@ with tab4:
             go.Scatter(
                 x=df["Année"],
                 y=df["Valeur Nette Acheteur (€)"],
-                mode="lines+markers",
+                mode="lines",
                 name="🏡 Valeur Nette Acheteur",
                 line=dict(color="#2ca02c", width=3),
-                marker=dict(size=6),
             )
         )
 
@@ -1822,10 +1821,9 @@ with tab4:
             go.Scatter(
                 x=df["Année"],
                 y=df["Portefeuille Locataire (€)"],
-                mode="lines+markers",
+                mode="lines",
                 name="💼 Portefeuille Locataire",
                 line=dict(color="#ff7f0e", width=3),
-                marker=dict(size=6),
             )
         )
 

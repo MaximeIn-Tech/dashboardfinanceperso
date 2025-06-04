@@ -8,14 +8,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## 2025-06-04
 
-### Ajouté
+### Added
 
 - New tab for the loan calculator.
 
-### Modifié
+### Changed
 
 - Updated content of `README.md`.
 - CSS styles added to `assets/styles.css`.
+
+### Removed
+
+- Markers on line chart for Buy vs Rent
 
 ## 2025-06-03
 
