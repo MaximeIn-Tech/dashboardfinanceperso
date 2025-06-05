@@ -6,6 +6,12 @@ Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/)
 
 ---
 
+## 2025-06-05
+
+### Changed
+
+- Refactoring du code pour le rendre modulable et non plus un bloc entier.
+
 ## 2025-06-04
 
 ### Added

@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
+## 2025-06-05
+
+### Changed
+
+- Refactored the main code into modules (especially for the 5 tabs)
+
 ## 2025-06-04
 
 ### Added
