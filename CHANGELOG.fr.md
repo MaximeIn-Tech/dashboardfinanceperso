@@ -11,6 +11,7 @@ Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/)
 ### Added
 
 - Ajout d'un sélectionneur d'années ou mois sur le prêt immo
+- Ajout des taux immo.
 
 ### Changed
 

@@ -11,6 +11,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Added
 
 - Add a selector for year or months under the loan tab.
+- Add information on rates.
 
 ### Changed
 

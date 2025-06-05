@@ -16,13 +16,13 @@ def calculateur_pret_render():
     taux_usure = 6.24  # Exemple pour prêt >20 ans (mai 2025)
     taux_bce = 4.25  # Taux directeur BCE
 
-    with st.expander("📊 Informations de marché (taux)", expanded=True):
+    with st.expander("📊 Informations de marché (taux)", expanded=False):
         col1, col2 = st.columns(2)
 
         with col1:
-            st.metric("Taux d'usure (20 ans+)", "6.24 %")
+            st.metric("Taux d'usure (20 ans+)", "5.31 %")
         with col2:
-            st.metric("Taux directeur BCE", "4.25 %")
+            st.metric("Taux directeur BCE", "2 %")
 
         st.caption("Données à jour de la Banque de France / BCE.")
 
