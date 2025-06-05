@@ -20,7 +20,7 @@ def calculateur_pret_render():
         col1, col2 = st.columns(2)
 
         with col1:
-            st.metric("Taux d'usure (20 ans+)", "5.31 %")
+            st.metric("Taux d'usure (≥ 20 ans)", "5.31 %")
         with col2:
             st.metric("Taux directeur BCE", "2 %")
 
