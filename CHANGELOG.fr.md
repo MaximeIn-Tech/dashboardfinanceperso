@@ -8,6 +8,10 @@ Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/)
 
 ## 2025-06-05
 
+### Added
+
+- Ajout d'un sélectionneur d'années ou mois sur le prêt immo
+
 ### Changed
 
 - Refactoring du code pour le rendre modulable et non plus un bloc entier.

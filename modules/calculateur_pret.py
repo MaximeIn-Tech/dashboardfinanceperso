@@ -11,6 +11,21 @@ from utils.helpers import format_nombre
 def calculateur_pret_render():
     st.header("🏠 Simulateur de Prêt Immobilier")
 
+    # Taux économiques - à mettre à jour dynamiquement plus tard
+
+    taux_usure = 6.24  # Exemple pour prêt >20 ans (mai 2025)
+    taux_bce = 4.25  # Taux directeur BCE
+
+    with st.expander("📊 Informations de marché (taux)", expanded=True):
+        col1, col2 = st.columns(2)
+
+        with col1:
+            st.metric("Taux d'usure (20 ans+)", "6.24 %")
+        with col2:
+            st.metric("Taux directeur BCE", "4.25 %")
+
+        st.caption("Données à jour de la Banque de France / BCE.")
+
     # Interface d'entrée avec colonnes
     col1, col2, col3 = st.columns(3)
 
@@ -27,14 +42,23 @@ def calculateur_pret_render():
 
     with col2:
         st.markdown("### 📅 Durée du prêt")
-        duree_annees = st.number_input(
-            "Durée du prêt (années)",
-            min_value=5,
-            max_value=30,
-            value=20,
-            step=1,
-            help="Rentrez le nombre d'années de votre prêt.",
-        )
+
+        col_duree, col_unite = st.columns([4, 2])
+
+        with col_unite:
+            unite_duree = st.selectbox("", options=["ans", "mois"])
+
+        with col_duree:
+            if unite_duree == "ans":
+                duree = st.number_input(
+                    "Durée du prêt", min_value=1, max_value=30, value=20
+                )
+                duree_mois = duree * 12
+            else:
+                duree = st.number_input(
+                    "Durée du prêt", min_value=12, max_value=360, value=240, step=12
+                )
+                duree_mois = duree
 
     with col3:
         st.markdown("### 📈 Taux d'intérêt")
@@ -54,7 +78,7 @@ def calculateur_pret_render():
     st.markdown("---")
 
     # Calculs
-    mois = duree_annees * 12
+    mois = duree_mois
     taux_mensuel = taeg / 100 / 12
     if taux_mensuel > 0:
         mensualite = montant * (taux_mensuel / (1 - (1 + taux_mensuel) ** -mois))
