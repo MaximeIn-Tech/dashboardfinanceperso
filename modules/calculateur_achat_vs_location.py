@@ -5,6 +5,8 @@ import plotly.graph_objects as go
 import streamlit as st
 from plotly.subplots import make_subplots
 
+# from utils.helpers import custom_alert
+
 
 def achat_vs_location_render():
     # Fonction de calcul des mensualités de prêt
@@ -337,9 +339,10 @@ def achat_vs_location_render():
 
         st.info(
             """
-        **💡 Interprétation :**
-        - Le portefeuille locataire inclut l'apport investi et les économies réalisées chaque année.
-        - La valeur nette acheteur tient compte de la revente du bien (avec frais) et du capital remboursé.
-        - La ligne rouge verticale indique l'année où louer devient plus rentable qu'acheter (si applicable).
-        """
+            **💡 Interprétation :**
+
+            - Le portefeuille locataire inclut l'apport investi et les économies réalisées chaque année.
+            - La valeur nette acheteur tient compte de la revente du bien (avec frais) et du capital remboursé.
+            - La ligne rouge verticale indique l'année où louer devient plus rentable qu'acheter (si applicable).
+                """
         )

@@ -2,7 +2,6 @@
     color: #FAFAFA !important;
     /* Couleur fixe sombre */
     margin-bottom: 10px;
-    font-size: 50px;
     font-weight: 600;
 }
 
@@ -229,21 +228,48 @@
     transform: scale(1.2);
 }
 
-
-.metric-card {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    padding: 1rem;
-    border-radius: 10px;
-    color: white;
-    text-align: center;
-    margin: 0.5rem 0;
+.custom-alert {
+    border-radius: 16px;
+    padding: 20px 28px 12px 28px; /* moins de padding en bas */
+    margin-bottom: 24px;
+    font-weight: 600;
+    font-size: 1rem;
+    line-height: 1.5;
+    user-select: text;
+    cursor: default;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    background-clip: padding-box;
 }
 
-.stTabs [data-baseweb="tab-list"] {
-    gap: 2px;
+.custom-alert:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.4);
 }
 
-.stTabs [data-baseweb="tab"] {
-    padding-left: 20px;
-    padding-right: 20px;
+/* Types d'alerte pastel très doux */
+.custom-alert.info {
+    background-color: #e6f0ff;  /* bleu pastel ultra doux */
+    border-left: 6px solid #a8c7ff; /* bleu clair pastel */
+    color: #02366a;
+    box-shadow: 0 2px 4px rgba(58, 91, 191, 0.1);
 }
+.custom-alert.success {
+    background-color: #e8fae8;  /* vert pastel ultra doux */
+    border-left: 6px solid #a6d8a6; /* vert clair pastel */
+    color: #166a30;
+    box-shadow: 0 2px 4px rgba(49, 115, 49, 0.1);
+}
+.custom-alert.warning {
+    background-color: #fffce6;  /* jaune pastel ultra doux */
+    border-left: 6px solid #ffed99; /* jaune clair pastel */
+    color: #8f6b03;
+    box-shadow: 0 2px 4px rgba(142, 127, 0, 0.1);
+}
+.custom-alert.error {
+    background-color: #ffe7e9;  /* rouge pastel ultra doux */
+    border-left: 6px solid #ffb3b8; /* rouge clair pastel */
+    color: #7b3439;
+    box-shadow: 0 2px 4px rgba(159, 49, 55, 0.1);
+}
+

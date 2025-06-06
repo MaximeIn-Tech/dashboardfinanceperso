@@ -1,19 +1,19 @@
 import streamlit as st
 
+# Configuration générale
+st.set_page_config(page_title="Calculateurs Financiers", page_icon="💰", layout="wide")
+
 from modules.interets_composes import interets_composes_render
 from modules.calculateur_fire import calculateur_fire_render
 from modules.calculateur_impots import calculateur_impots_render
 from modules.calculateur_pret import calculateur_pret_render
 from modules.calculateur_achat_vs_location import achat_vs_location_render
 
-from components.footer import render_footer
+from modules.footer import render_footer
 
-from utils.helpers import format_nombre, load_css
+from utils.helpers import load_css
 
-# Configuration générale
-st.set_page_config(page_title="Calculateurs Financiers", page_icon="💰", layout="wide")
-
-css = load_css()
+load_css()
 
 st.title("💰 Calculateurs Financiers")
 st.markdown("Une suite d'outils pour planifier vos finances personnelles")

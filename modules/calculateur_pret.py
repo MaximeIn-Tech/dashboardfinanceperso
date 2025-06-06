@@ -20,9 +20,17 @@ def calculateur_pret_render():
         col1, col2 = st.columns(2)
 
         with col1:
-            st.metric("Taux d'usure (≥ 20 ans)", "5.31 %")
+            st.metric(
+                "Taux d'usure (≥ 20 ans)",
+                "5.31 %",
+                help="Le taux d'usure est le taux maximal légal auquel un prêt peut être accordé. Il inclut intérêts, assurances et frais. Fixé par la Banque de France.",
+            )
         with col2:
-            st.metric("Taux directeur BCE", "2 %")
+            st.metric(
+                "Taux directeur BCE",
+                "2 %",
+                help="Le taux directeur est fixé par la Banque centrale européenne. Il influence le coût de l'argent pour les banques et donc les taux des crédits.",
+            )
 
         st.caption("Données à jour de la Banque de France / BCE.")
 
@@ -46,7 +54,10 @@ def calculateur_pret_render():
         col_duree, col_unite = st.columns([4, 2])
 
         with col_unite:
-            unite_duree = st.selectbox("", options=["ans", "mois"])
+            unite_duree = st.selectbox(
+                "Temporalité",
+                options=["ans", "mois"],
+            )
 
         with col_duree:
             if unite_duree == "ans":
@@ -160,7 +171,7 @@ def calculateur_pret_render():
         st.metric(
             "📈 Intérêts totaux",
             f"{format_nombre(total_interets)} €",
-            delta=f"{ratio_interet:.1%} du capital",
+            delta=f"Soit {ratio_interet:.1%} du prix du bien.",
             help="Total des intérêts sur toute la durée",
         )
 

@@ -5,18 +5,17 @@ import plotly.graph_objects as go
 import streamlit as st
 from plotly.subplots import make_subplots
 
-from utils.helpers import format_nombre, load_css
-
-css = load_css()
+from utils.helpers import format_nombre
 
 
 def calculateur_impots_render():
     st.header("🧮 Calculateur d'Impôts et TMI")
 
-    col1, col2 = st.columns(2)
+    col1, col2, col3 = st.columns(3)
 
     with col1:
         st.subheader("💰 Revenus")
+
         revenus_imposables = st.number_input(
             "Revenus bruts annuels (€)",
             min_value=0.0,
@@ -25,7 +24,8 @@ def calculateur_impots_render():
             format="%.0f",
             key="tmi_revenus",
         )
-
+    with col2:
+        st.subheader("🧑‍🧑‍🧒 Situation familiale")
         situation_familiale = st.selectbox(
             "Situation familiale",
             [
@@ -48,20 +48,14 @@ def calculateur_impots_render():
 
         nb_parts = parts_fiscales[situation_familiale]
 
-    with col2:
-        st.subheader("⚙️ Paramètres")
+    with col3:
+        st.subheader("📆 Année Fiscale")
         annee_fiscale = st.selectbox("Année fiscale", [2024, 2023], key="tmi_annee")
 
         # Application de l'abattement de 10 % sur les revenus (plafonné à 13 522 € pour 2024)
         plafond_abattement = 13522 if annee_fiscale == 2024 else 12912
         abattement_10 = min(revenus_imposables * 0.10, plafond_abattement)
         revenus_abattus = revenus_imposables - abattement_10
-
-        st.info(f"📊 Nombre de parts fiscales : {nb_parts}")
-        st.info(
-            f"📉 Abattement de 10% appliqué : {abattement_10:,.0f} €\n\n"
-            f"Revenus imposables après abattement : {revenus_abattus:,.0f} €"
-        )
 
     # Barème 2024 (revenus 2023)
     if annee_fiscale == 2024:
@@ -150,7 +144,7 @@ def calculateur_impots_render():
     st.markdown("---")
 
     # Résultats
-    col1, col2, col3, col4 = st.columns(4)
+    col1, col2, col3, col4, col5 = st.columns(5)
 
     with col1:
         st.metric(
@@ -173,6 +167,9 @@ def calculateur_impots_render():
 
     with col4:
         st.metric("💸 Impôt sur le revenu", f"{impot_net:,.0f} €")
+
+    with col5:
+        st.metric("🍰 Nombre de parts", f"{nb_parts}")
 
     if cotisations > 0:
         col1, col2, col3, col4 = st.columns(4)
@@ -324,9 +321,6 @@ def calculateur_impots_render():
         # Conseils d'optimisation fiscale
     # Conseils d'optimisation fiscale
     st.subheader("💡 Conseils d'optimisation fiscale")
-
-    # CSS personnalisé qui utilise automatiquement les variables CSS de Streamlit
-    st.markdown(f"<style>{css}</style>", unsafe_allow_html=True)
 
     # Créer les conseils avec catégories et priorités
     conseils_data = []

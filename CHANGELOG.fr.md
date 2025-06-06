@@ -6,6 +6,12 @@ Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/)
 
 ---
 
+## 2025-06-06
+
+### Added
+
+- Un meilleur visuel sur FIRE et Intérêts composés.
+
 ## 2025-06-05
 
 ### Added

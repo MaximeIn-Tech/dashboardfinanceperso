@@ -9,59 +9,80 @@ from utils.helpers import format_nombre
 def calculateur_fire_render():
     st.header("🔥 Calculateur FI/RE (Financial Independence, Retire Early)")
 
+    st.caption(
+        "Remplissez les champs ci-dessous pour simuler votre parcours vers l'indépendance financière."
+    )
+
+    # Layout 3 colonnes
     col1, col2, col3 = st.columns(3)
 
+    # --- Colonne 1 : Revenus & Dépenses ---
     with col1:
+        st.subheader("💼 Revenus & Dépenses")
         revenus_annuels = st.number_input(
-            "Revenus annuels nets (€)",
+            label="💼 Revenus nets annuels (€)",
             min_value=0.0,
             value=40000.0,
             step=1000.0,
             format="%.0f",
             key="fire_revenus",
+            help="Vos revenus nets annuels, incluant salaire, primes, freelancing, etc.",
         )
 
         depenses_annuelles = st.number_input(
-            "Dépenses annuelles (€)",
+            label="💸 Dépenses annuelles (€)",
             min_value=0.0,
             value=25000.0,
             step=1000.0,
             format="%.0f",
             key="fire_depenses",
+            help="Vos dépenses annuelles estimées : logement, alimentation, transport, loisirs, etc.",
         )
 
+    # --- Colonne 2 : Patrimoine & Rendement ---
     with col2:
+        st.subheader("📊 Situation financière actuelle")
         patrimoine_actuel = st.number_input(
-            "Patrimoine actuel (€)",
+            label="📊 Patrimoine total actuel (€)",
             min_value=0.0,
             value=10000.0,
             step=1000.0,
             format="%.0f",
             key="fire_patrimoine",
+            help="Total de vos actifs disponibles (livrets, bourse, cryptos, etc.)",
         )
 
         taux_retour = st.number_input(
-            "Taux de retour attendu (%)",
+            label="📈 Rendement annuel attendu (%)",
             min_value=0.0,
             max_value=20.0,
             value=7.0,
             step=0.5,
             key="fire_taux",
+            help="Taux de croissance annuel moyen espéré pour vos investissements.",
         )
 
+    # --- Colonne 3 : Paramètres FIRE ---
     with col3:
+        st.subheader("🔥 Hypothèses FIRE")
         taux_retrait = st.number_input(
-            "Règle de retrait (%)",
+            label="🔥 Taux de retrait (%)",
             min_value=1.0,
             max_value=10.0,
             value=4.0,
             step=0.5,
             key="fire_retrait",
-            help="Pourcentage du patrimoine que vous pourrez retirer chaque année en retraite (règle des 4%)",
+            help="Pourcentage du patrimoine que vous pouvez retirer chaque année à la retraite (ex : règle des 4%).",
         )
 
         age_actuel = st.number_input(
-            "Âge actuel", min_value=18, max_value=65, value=30, key="fire_age"
+            label="🎂 Âge actuel",
+            min_value=18,
+            max_value=70,
+            value=30,
+            step=1,
+            key="fire_age",
+            help="Votre âge aujourd'hui, utilisé pour estimer l'âge d'atteinte de l'indépendance.",
         )
 
     # Calculs FIRE
@@ -96,71 +117,118 @@ def calculateur_fire_render():
 
     st.markdown("---")
 
-    # Métriques FIRE
+    # Dashboard FIRE moderne et visuel
+    st.markdown("## 🔥 **Tableau de bord FIRE**")
+
+    # Calculs préliminaires
+    patrimoine_manquant = max(0, nombre_fire - patrimoine_actuel)
+    progres_fire = (patrimoine_actuel / nombre_fire) * 100 if nombre_fire > 0 else 0
+
+    # === SECTION 1 : Métriques principales avec couleurs conditionnelles ===
     col1, col2, col3, col4 = st.columns(4)
+
+    # --- Capital FIRE ---
     with col1:
         st.metric(
-            "💰 Nombre FIRE",
-            f"{format_nombre(nombre_fire)} €",
-            help="Votre capital investi pour pouvoir être FI/RE.",
+            label="💰 Capital FIRE",
+            value=f"{format_nombre(nombre_fire)} €",
+            help="Capital nécessaire pour l'indépendance financière (25x vos dépenses annuelles)",
         )
+
+    # --- Taux d'épargne ---
     with col2:
+        if taux_epargne >= 50:
+            delta_text = "🚀 Excellent !"
+            delta_color = "normal"
+        elif taux_epargne >= 25:
+            delta_text = "👍 Très bien"
+            delta_color = "normal"
+        elif taux_epargne >= 10:
+            delta_text = "⚠️ Modéré"
+            delta_color = "off"
+        else:
+            delta_text = "📉 Faible"
+            delta_color = "inverse"
+
         st.metric(
-            "📊 Taux d'épargne",
-            f"{taux_epargne:.1f}%",
-            help="Votre capacité/taux d'épargne accessible.",
+            label="📊 Taux d’épargne",
+            value=f"{taux_epargne:.1f}%",
+            delta=delta_text,
+            delta_color=delta_color,
+            help="Pourcentage de vos revenus que vous épargnez chaque année",
         )
+
+    # --- Temps restant avant FIRE ---
     with col3:
         if annees_fire < 100:
+            if annees_fire <= 10:
+                delta_text = "🔥 Très proche !"
+                delta_color = "normal"
+            elif annees_fire <= 20:
+                delta_text = "💪 Bon rythme"
+                delta_color = "normal"
+            else:
+                delta_text = "⏳ Long terme"
+                delta_color = "off"
+
             st.metric(
-                "⏰ Années jusqu'à FIRE",
-                f"{annees_fire:.1f} ans",
-                help="Le nombre d'années qu'il vous reste pour être FI/RE.",
+                label="⏰ Temps restant",
+                value=f"{annees_fire:.1f} ans",
+                delta=delta_text,
+                delta_color=delta_color,
+                help="Nombre d'années avant d’atteindre l’indépendance financière",
             )
         else:
-            st.metric("⏰ Années jusqu'à FIRE", "Impossible")
+            st.metric(
+                label="⏰ Temps restant",
+                value="∞",
+                delta="Impossible en l'état",
+                delta_color="inverse",
+                help="Avec votre épargne actuelle, FIRE n’est pas atteignable",
+            )
+
+    # --- Âge d’indépendance ---
     with col4:
         if annees_fire < 100:
+            if age_fire <= 40:
+                delta_text = "🌟 Retraite précoce"
+                delta_color = "normal"
+            elif age_fire <= 55:
+                delta_text = "🎯 Pré-retraite"
+                delta_color = "normal"
+            else:
+                delta_text = "📅 Retraite standard"
+                delta_color = "off"
+
             st.metric(
-                "🎂 Âge FIRE",
-                f"{age_fire:.0f} ans",
-                help="Votre âge quand vous pourrez être FI/RE.",
+                label="🎂 Âge d’indépendance",
+                value=f"{age_fire:.0f} ans",
+                delta=delta_text,
+                delta_color=delta_color,
+                help="Votre âge estimé à l’atteinte de l’indépendance financière",
             )
         else:
-            st.metric("🎂 Âge FIRE", "N/A")
-
-    # Conseils FIRE
-    col1, col2 = st.columns(2)
-
-    with col1:
-        if taux_epargne >= 50:
-            st.success(
-                "🚀 Excellent taux d'épargne ! Vous êtes sur la voie rapide vers FIRE."
-            )
-        elif taux_epargne >= 25:
-            st.info("👍 Bon taux d'épargne. Continuez comme ça !")
-        elif taux_epargne >= 10:
-            st.warning(
-                "⚠️ Taux d'épargne modéré. Essayez d'augmenter vos revenus ou réduire vos dépenses."
-            )
-        else:
-            st.error(
-                "📉 Taux d'épargne faible. FIRE sera difficile à atteindre sans changements majeurs."
+            st.metric(
+                label="🎂 Âge d’indépendance",
+                value="N/A",
+                delta="Objectif non atteignable",
+                delta_color="inverse",
             )
 
-    with col2:
-        st.info(
-            f"""
-        **Votre situation FIRE :**
-        - Épargne mensuelle : {format_nombre(epargne_annuelle/12)} €
-        - Revenus passifs nécessaires : {format_nombre(depenses_annuelles)} €/an
-        - Patrimoine manquant : {format_nombre(max(0, nombre_fire - patrimoine_actuel))} €
-        """
-        )
+    st.metric(
+        label="📊 Progression vers FIRE",
+        value=f"{progres_fire:.1f}%",
+        delta=f"{format_nombre(patrimoine_manquant)} € restants",
+    )
+
+    st.progress(progres_fire / 100)
+
+    # Note explicative
+    st.markdown("---")
 
     # Simulation évolution patrimoine
     if annees_fire < 50:
-        annees_sim = list(range(0, int(annees_fire) + 5))
+        annees_sim = list(range(0, int(annees_fire) + 10))
         patrimoine_evolution = []
 
         for annee in annees_sim:
@@ -175,24 +243,62 @@ def calculateur_fire_render():
                     )
                 patrimoine_evolution.append(patrimoine)
 
-        fig_fire = go.Figure()
-        fig_fire.add_trace(
-            go.Scatter(
-                x=annees_sim,
-                y=patrimoine_evolution,
-                name="Patrimoine projeté",
-                line=dict(color="#ff7f0e"),
+        if patrimoine_actuel <= patrimoine_manquant:
+            fig_fire = go.Figure()
+            fig_fire.add_trace(
+                go.Scatter(
+                    x=annees_sim,
+                    y=patrimoine_evolution,
+                    mode="lines",
+                    name="Patrimoine projeté",
+                    line=dict(color="#ff7f0e"),
+                )
             )
-        )
-        fig_fire.add_hline(
-            y=nombre_fire,
-            line_dash="dash",
-            line_color="red",
-            annotation_text="Nombre FIRE",
-        )
-        fig_fire.update_layout(
-            title="Projection vers l'indépendance financière",
-            xaxis_title="Années",
-            yaxis_title="Patrimoine (€)",
-        )
-        st.plotly_chart(fig_fire, use_container_width=True)
+            fig_fire.add_hline(
+                y=nombre_fire,
+                line_dash="dash",
+                line_color="red",
+                annotation_text="Nombre FIRE",
+            )
+            fig_fire.update_layout(
+                title="Projection vers l'indépendance financière",
+                xaxis_title="Années",
+                yaxis_title="Patrimoine (€)",
+            )
+            st.plotly_chart(fig_fire, use_container_width=True)
+        else:
+            # === Message de réussite FIRE ===
+            with st.container():
+                st.markdown("### 🏆 Objectif atteint : Indépendance Financière")
+                st.success("🎉 Félicitations ! Vous avez atteint votre objectif FIRE.")
+                st.markdown(
+                    "Votre capital couvre désormais **vos dépenses annuelles à vie**, selon la **règle des 4%**.\n\n"
+                    "Vous pouvez désormais **choisir de ne plus travailler pour l'argent**. "
+                    "Libre à vous de ralentir, pivoter ou explorer de nouveaux projets !"
+                )
+                st.balloons()
+            horizon_projection = int(annees_fire) + 5
+            fig_fire = go.Figure()
+            fig_fire.add_trace(
+                go.Scatter(
+                    x=annees_sim,
+                    y=patrimoine_evolution,
+                    mode="lines",
+                    name="Patrimoine projeté",
+                    line=dict(color="#2ca02c"),
+                )
+            )
+            fig_fire.add_hline(
+                y=nombre_fire,
+                line_dash="dash",
+                line_color="red",
+                annotation_text="Seuil FIRE atteint",
+                annotation_position="top right",
+            )
+            fig_fire.update_layout(
+                title="🚀 Projection au-delà de l'indépendance financière",
+                xaxis_title="Années",
+                yaxis_title="Patrimoine (€)",
+                showlegend=True,
+            )
+            st.plotly_chart(fig_fire, use_container_width=True)

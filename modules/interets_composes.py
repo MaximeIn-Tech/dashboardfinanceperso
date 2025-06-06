@@ -9,87 +9,100 @@ import streamlit as st
 
 def interets_composes_render():
     st.header("🏦 Calculateur d'Intérêts Composés")
+    st.write(
+        "Simulez la croissance de votre capital avec versements périodiques et intérêts composés."
+    )
 
-    # Paramètres principaux
-    col1, col2 = st.columns(2)
+    # === Mise en page 3 colonnes ===
 
+    col1, col2, col3 = st.columns(3)
+
+    # === Section 1: Capital & Versements ===
     with col1:
-        with st.container():
-            st.markdown("## 💶 Capital et versements")
-            st.caption("🔧 Paramétrez votre simulation d’investissement ci-dessous.")
+        st.subheader(
+            "💶 Capital & Versements",
+            help="Définissez votre point de départ et vos apports réguliers.",
+        )
 
-            with st.expander("🧾 Capital de départ", expanded=True):
-                capital_initial = st.number_input(
-                    "Capital initial (€)",
-                    min_value=0.0,
-                    value=0.0,
-                    step=100.0,
-                    key="ic_capital",
-                    format="%.0f",
-                    help="Montant dont vous disposez au départ.",
-                )
+        capital_initial = st.number_input(
+            "Capital initial (€)",
+            min_value=0.0,
+            value=0.0,
+            step=100.0,
+            key="ic_capital",
+            format="%.0f",
+            help="Montant dont vous disposez au départ, sans encore générer d’intérêts.",
+        )
 
-            with st.expander("🔁 Versements réguliers", expanded=True):
-                versement_periodique = st.number_input(
-                    "Versement périodique (€)",
-                    min_value=0.0,
-                    value=100.0,
-                    step=10.0,
-                    key="ic_versement",
-                    format="%.0f",
-                    help="Montant que vous ajoutez à chaque période.",
-                )
+        col_v1, col_v2 = st.columns([2, 1])
+        with col_v1:
+            versement_periodique = st.number_input(
+                "Montant du versement périodique (€)",
+                min_value=0.0,
+                value=100.0,
+                step=10.0,
+                key="ic_versement",
+                format="%.0f",
+                help="Somme ajoutée régulièrement pour faire grossir votre capital.",
+            )
+        with col_v2:
+            frequence_versement = st.selectbox(
+                "Fréquence",
+                ["Mensuel", "Trimestriel", "Semestriel", "Annuel"],
+                key="ic_freq_versement",
+                help="À quelle fréquence vous ajoutez ces versements à votre capital.",
+            )
 
-                frequence_versement = st.selectbox(
-                    "Fréquence des versements",
-                    ["Mensuel", "Trimestriel", "Semestriel", "Annuel"],
-                    key="ic_freq_versement",
-                    help="À quelle fréquence vous versez ce montant.",
-                )
-
-            with st.expander("📈 Paramètres de croissance", expanded=True):
-                taux_annuel = st.number_input(
-                    "Taux d'intérêt annuel (%)",
-                    min_value=0.0,
-                    max_value=50.0,
-                    value=5.0,
-                    step=0.1,
-                    key="ic_taux",
-                    format="%.1f",
-                    help="Taux de rendement estimé chaque année (hors inflation).",
-                )
-
-                duree_annees = st.number_input(
-                    "Durée de placement (années)",
-                    min_value=1,
-                    max_value=50,
-                    value=10,
-                    step=1,
-                    key="ic_duree",
-                    help="Nombre total d'années pendant lesquelles vous investissez.",
-                )
-
+    # === Section 2: Croissance & Durée ===
     with col2:
-        st.markdown("## ⚙️ Paramètres de capitalisation")
-        st.caption("⚡ Ajustez la mécanique d'accumulation des intérêts.")
+        st.subheader(
+            "📈 Croissance & Durée",
+            help="Paramétrez le rendement attendu et la durée de votre investissement.",
+        )
 
-        with st.expander("📊 Capitalisation", expanded=True):
-            frequence_capitalisation = st.selectbox(
-                "Fréquence de capitalisation des intérêts",
-                ["Mensuelle", "Trimestrielle", "Semestrielle", "Annuelle", "Continue"],
-                index=3,  # Annuelle par défaut
-                key="ic_freq_capitalisation",
-                help="Fréquence à laquelle les intérêts sont réintégrés pour générer des intérêts composés.",
-            )
+        taux_annuel = st.number_input(
+            "Taux d'intérêt annuel (%)",
+            min_value=0.0,
+            max_value=50.0,
+            value=5.0,
+            step=0.1,
+            key="ic_taux",
+            format="%.1f",
+            help="Taux de rendement attendu par an, hors inflation.",
+        )
 
-        with st.expander("📅 Moment des versements", expanded=True):
-            moment_versement = st.selectbox(
-                "Moment du versement",
-                ["Début de période", "Fin de période"],
-                index=1,  # Fin de période par défaut
-                key="ic_moment_versement",
-                help="Moment auquel les versements périodiques sont effectués dans chaque cycle.",
-            )
+        duree_annees = st.number_input(
+            "Durée du placement (années)",
+            min_value=1,
+            max_value=50,
+            value=10,
+            step=1,
+            key="ic_duree",
+            help="Nombre d'années pendant lesquelles vous laissez votre capital fructifier.",
+        )
+
+    # === Section 3: Capitalisation des intérêts ===
+    with col3:
+        st.subheader(
+            "⚙️ Capitalisation des intérêts",
+            help="Définissez la fréquence à laquelle vos intérêts sont ajoutés au capital, pour bénéficier de l’effet composé.",
+        )
+
+        frequence_capitalisation = st.selectbox(
+            "Fréquence de capitalisation",
+            ["Mensuelle", "Trimestrielle", "Semestrielle", "Annuelle", "Continue"],
+            index=3,  # Annuelle par défaut
+            key="ic_freq_capitalisation",
+            help="À quelle fréquence les intérêts générés sont réinvestis dans le capital.",
+        )
+
+        moment_versement = st.selectbox(
+            "Moment du versement périodique",
+            ["Début de période", "Fin de période"],
+            index=1,  # Fin de période par défaut
+            key="ic_moment_versement",
+            help="Quand vos versements réguliers sont ajoutés : avant ou après calcul des intérêts de la période.",
+        )
 
     # Options avancées
     st.subheader("Options avancées")
