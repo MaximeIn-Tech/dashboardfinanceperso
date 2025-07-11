@@ -13,8 +13,8 @@ def calculateur_pret_render():
 
     # Taux économiques - à mettre à jour dynamiquement plus tard
 
-    taux_usure = 6.24  # Exemple pour prêt >20 ans (mai 2025)
-    taux_bce = 4.25  # Taux directeur BCE
+    taux_usure = 5.31  # Exemple pour prêt >20 ans (mai 2025)
+    taux_bce = 2  # Taux directeur BCE
 
     with st.expander("📊 Informations de marché (taux)", expanded=False):
         col1, col2 = st.columns(2)
@@ -22,13 +22,13 @@ def calculateur_pret_render():
         with col1:
             st.metric(
                 "Taux d'usure (≥ 20 ans)",
-                "5.31 %",
+                f"{taux_usure} %",
                 help="Le taux d'usure est le taux maximal légal auquel un prêt peut être accordé. Il inclut intérêts, assurances et frais. Fixé par la Banque de France.",
             )
         with col2:
             st.metric(
                 "Taux directeur BCE",
-                "2 %",
+                f"{taux_bce} %",
                 help="Le taux directeur est fixé par la Banque centrale européenne. Il influence le coût de l'argent pour les banques et donc les taux des crédits.",
             )
 
@@ -85,6 +85,8 @@ def calculateur_pret_render():
                 "C'est le meilleur indicateur pour comparer les offres entre elles."
             ),
         )
+        if taeg > taux_usure:
+            st.caption("❌ Ce taux est impossible. Il est supérieur au taux d'usure.")
 
     st.markdown("---")
 

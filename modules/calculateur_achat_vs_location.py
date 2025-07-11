@@ -182,58 +182,76 @@ def achat_vs_location_render():
 
         # Simulation année par année
         data = []
+
+        # Variables pour le locataire
         loyer = loyer_initial
+        portefeuille_locataire = (
+            cout_initial_achat  # Investit l'équivalent de l'apport + frais
+        )
+
+        # Variables pour l'acheteur
         valeur_bien = prix_bien
-        portefeuille_loc = cout_initial_achat  # L'apport est investi
-        cash_acheteur = 0
 
         for annee in range(1, duree_projection + 1):
+            # === SCENARIO ACHETEUR ===
+            # Valeur du bien qui augmente
             valeur_bien *= 1 + croissance_immo
 
-            cout_location = loyer * 12
-            paiement_annuel_credit = (
-                mensualite_credit * 12 if annee <= duree_credit else 0
-            )
-            interets_annuels = (
-                soldes_pret[annee - 1] * taux_emprunt if annee <= duree_credit else 0
-            )
-            capital_rembourse = (
-                paiement_annuel_credit - interets_annuels
-                if annee <= duree_credit
-                else 0
-            )
+            # Mensualité du crédit (0 si prêt fini)
+            mensualite_annuelle = mensualite_credit * 12 if annee <= duree_credit else 0
 
-            # Locataire : investit la différence entre mensualité crédit et loyer
-            surplus_annuel = max(0, paiement_annuel_credit - cout_location)
-            portefeuille_loc *= 1 + rendement_portefeuille
-            portefeuille_loc += surplus_annuel
-
-            # Acheteur : simule les liquidités restantes (ex. économies faites vs location)
-            epargne_equivalente = max(0, cout_location - paiement_annuel_credit)
-            cash_acheteur += epargne_equivalente
-            cash_acheteur *= 1 + rendement_portefeuille
-
-            # Solde du prêt
+            # Solde restant du prêt
             solde_emprunt = soldes_pret[annee - 1] if annee <= duree_credit else 0
-            valeur_nette_acheteur = (
-                valeur_bien * (1 - frais_revente) - solde_emprunt + cash_acheteur
+
+            # Valeur nette de l'acheteur (valeur du bien - solde du prêt - frais de revente)
+            valeur_nette_acheteur = valeur_bien * (1 - frais_revente) - solde_emprunt
+
+            # === SCENARIO LOCATAIRE ===
+            # Coût du loyer pour l'année
+            cout_loyer_annuel = loyer * 12
+
+            # Différence mensuelle entre mensualité crédit et loyer
+            difference_mensuelle = (
+                (mensualite_credit - loyer) if annee <= duree_credit else -loyer
             )
+            difference_annuelle = difference_mensuelle * 12
+
+            # Le portefeuille du locataire croît avec les rendements
+            portefeuille_locataire *= 1 + rendement_portefeuille
+
+            # Si la mensualité est plus élevée que le loyer, le locataire peut investir la différence
+            if difference_annuelle > 0:
+                portefeuille_locataire += difference_annuelle
+
+            # Si le prêt est fini, le locataire peut investir l'équivalent de ce que l'acheteur
+            # ne paie plus (mais continue à payer le loyer)
+            if annee > duree_credit:
+                # L'acheteur n'a plus de mensualité, mais le locataire paie toujours le loyer
+                # Le locataire peut investir l'équivalent de l'ancienne mensualité
+                portefeuille_locataire += mensualite_credit * 12
+
+            # L'acheteur paie des frais d'entretien que le locataire n'a pas
+            # Le locataire peut investir cet équivalent
+            portefeuille_locataire += entretien_annuel
 
             data.append(
                 {
                     "Année": annee,
                     "Valeur Bien (€)": valeur_bien,
                     "Solde Emprunt (€)": solde_emprunt,
-                    "Cash Acheteur (€)": cash_acheteur,
+                    "Mensualité Annuelle (€)": mensualite_annuelle,
+                    "Coût Loyer Annuel (€)": cout_loyer_annuel,
                     "Valeur Nette Acheteur (€)": valeur_nette_acheteur,
-                    "Portefeuille Locataire (€)": portefeuille_loc,
-                    "Loyer (€)": loyer,
+                    "Portefeuille Locataire (€)": portefeuille_locataire,
+                    "Loyer Mensuel (€)": loyer,
+                    "Différence Mensuelle (€)": difference_mensuelle,
                 }
             )
 
+            # Augmentation du loyer pour l'année suivante
             loyer *= 1 + croissance_loyer
 
-        # Affichage
+        # Création du DataFrame
         df = pd.DataFrame(data)
 
         # Valeurs finales
@@ -241,11 +259,14 @@ def achat_vs_location_render():
         portefeuille_locataire_final = df["Portefeuille Locataire (€)"].iloc[-1]
 
         # Calcul de la différence en pourcentage
-        diff_pct = (
-            100
-            * (portefeuille_locataire_final - portefeuille_acheteur_final)
-            / portefeuille_acheteur_final
-        )
+        if portefeuille_acheteur_final > 0:
+            diff_pct = (
+                100
+                * (portefeuille_locataire_final - portefeuille_acheteur_final)
+                / portefeuille_acheteur_final
+            )
+        else:
+            diff_pct = 0
 
         st.subheader("📊 Comparaison finale")
 
@@ -253,8 +274,9 @@ def achat_vs_location_render():
 
         with col1:
             st.metric(
-                label="📦 Portefeuille Acheteur",
+                label="🏡 Patrimoine Acheteur",
                 value=f"{portefeuille_acheteur_final:,.0f} €",
+                help="Valeur nette du bien immobilier après déduction des frais de revente et du solde du prêt",
             )
 
         with col2:
@@ -263,26 +285,36 @@ def achat_vs_location_render():
                 label="💼 Portefeuille Locataire",
                 value=f"{portefeuille_locataire_final:,.0f} €",
                 delta=delta_str,
+                help="Portefeuille financier constitué grâce aux économies réalisées par rapport à l'achat",
             )
 
         with col3:
+            avantage = (
+                "🏡 Acheteur"
+                if portefeuille_acheteur_final > portefeuille_locataire_final
+                else "💼 Locataire"
+            )
+            ecart = abs(portefeuille_acheteur_final - portefeuille_locataire_final)
             st.metric(
-                label="🔍 Différence Relative",
-                value=(
-                    "Acheteur > Locataire" if diff_pct < 0 else "Locataire > Acheteur"
-                ),
+                label="🏆 Avantage",
+                value=avantage,
+                delta=f"{ecart:,.0f} €",
+                help="Qui a le meilleur patrimoine final et l'écart en euros",
             )
 
+        # Recherche du point de croisement
         annee_croisement = None
         for i in range(1, len(df)):
             if (
-                df["Portefeuille Locataire (€)"][i] > df["Valeur Nette Acheteur (€)"][i]
-                and df["Portefeuille Locataire (€)"][i - 1]
-                <= df["Valeur Nette Acheteur (€)"][i - 1]
+                df["Portefeuille Locataire (€)"].iloc[i]
+                > df["Valeur Nette Acheteur (€)"].iloc[i]
+                and df["Portefeuille Locataire (€)"].iloc[i - 1]
+                <= df["Valeur Nette Acheteur (€)"].iloc[i - 1]
             ):
-                annee_croisement = df["Année"][i]
+                annee_croisement = df["Année"].iloc[i]
                 break
 
+        # Graphique principal
         fig = go.Figure()
 
         # Trace Acheteur
@@ -290,9 +322,11 @@ def achat_vs_location_render():
             go.Scatter(
                 x=df["Année"],
                 y=df["Valeur Nette Acheteur (€)"],
-                mode="lines",
-                name="🏡 Valeur Nette Acheteur",
+                mode="lines+markers",
+                name="🏡 Patrimoine Acheteur",
                 line=dict(color="#2ca02c", width=3),
+                marker=dict(size=4),
+                hovertemplate="<b>Acheteur</b><br>Année: %{x}<br>Patrimoine: %{y:,.0f} €<extra></extra>",
             )
         )
 
@@ -301,9 +335,11 @@ def achat_vs_location_render():
             go.Scatter(
                 x=df["Année"],
                 y=df["Portefeuille Locataire (€)"],
-                mode="lines",
+                mode="lines+markers",
                 name="💼 Portefeuille Locataire",
                 line=dict(color="#ff7f0e", width=3),
+                marker=dict(size=4),
+                hovertemplate="<b>Locataire</b><br>Année: %{x}<br>Portefeuille: %{y:,.0f} €<extra></extra>",
             )
         )
 
@@ -317,32 +353,97 @@ def achat_vs_location_render():
                 y=max(
                     df["Portefeuille Locataire (€)"].max(),
                     df["Valeur Nette Acheteur (€)"].max(),
-                ),
+                )
+                * 0.9,
                 text=f"📍 Croisement: Année {annee_croisement}",
                 showarrow=True,
                 arrowhead=1,
                 bgcolor="white",
+                bordercolor="red",
+                borderwidth=1,
             )
 
         fig.update_layout(
-            title="Évolution du patrimoine net - Acheter vs Louer",
+            title="📈 Évolution du patrimoine - Acheter vs Louer",
             xaxis_title="Année",
-            yaxis_title="Montant (€)",
+            yaxis_title="Patrimoine (€)",
             template="plotly_white",
             hovermode="x unified",
             legend=dict(
                 orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1
             ),
+            height=500,
         )
 
         st.plotly_chart(fig, use_container_width=True)
 
-        st.info(
-            """
-            **💡 Interprétation :**
+        # Tableau détaillé
+        with st.expander("📋 Tableau détaillé année par année"):
+            st.dataframe(
+                df.style.format(
+                    {
+                        "Valeur Bien (€)": "{:,.0f}",
+                        "Solde Emprunt (€)": "{:,.0f}",
+                        "Mensualité Annuelle (€)": "{:,.0f}",
+                        "Coût Loyer Annuel (€)": "{:,.0f}",
+                        "Valeur Nette Acheteur (€)": "{:,.0f}",
+                        "Portefeuille Locataire (€)": "{:,.0f}",
+                        "Loyer Mensuel (€)": "{:,.0f}",
+                        "Différence Mensuelle (€)": "{:+,.0f}",
+                    }
+                ),
+                use_container_width=True,
+            )
 
-            - Le portefeuille locataire inclut l'apport investi et les économies réalisées chaque année.
-            - La valeur nette acheteur tient compte de la revente du bien (avec frais) et du capital remboursé.
-            - La ligne rouge verticale indique l'année où louer devient plus rentable qu'acheter (si applicable).
-                """
+        # Informations et interprétation
+        st.info(
+            f"""
+            **💡 Interprétation des résultats :**
+
+            **Acheteur :**
+            - Investissement initial : {cout_initial_achat:,.0f} € (apport + frais)
+            - Mensualité : {mensualite_credit:,.0f} €/mois pendant {duree_credit} ans
+            - Frais d'entretien : {entretien_annuel:,.0f} €/an
+            - Patrimoine final : {portefeuille_acheteur_final:,.0f} €
+
+            **Locataire :**
+            - Investissement initial : {cout_initial_achat:,.0f} € (équivalent apport + frais)
+            - Loyer initial : {loyer_initial:,.0f} €/mois
+            - Loyer final : {df['Loyer Mensuel (€)'].iloc[-1]:,.0f} €/mois
+            - Portefeuille final : {portefeuille_locataire_final:,.0f} €
+
+            **Hypothèses :**
+            - Le locataire investit l'équivalent de l'apport + frais en bourse
+            - Le locataire investit la différence mensuelle (si positive) entre mensualité et loyer
+            - Le locataire investit l'équivalent des frais d'entretien qu'il n'a pas à payer
+            - Après la fin du crédit, le locataire investit l'équivalent de l'ancienne mensualité
+            """
         )
+
+        # Analyse de sensibilité
+        st.subheader("🔍 Analyse de sensibilité")
+
+        col1, col2 = st.columns(2)
+
+        with col1:
+            st.write("**Impact du rendement des investissements**")
+            if rendement_portefeuille > croissance_immo:
+                st.success(
+                    "✅ Le rendement boursier est supérieur à la croissance immobilière, favorisant la location"
+                )
+            else:
+                st.warning(
+                    "⚠️ La croissance immobilière est supérieure au rendement boursier, favorisant l'achat"
+                )
+
+        with col2:
+            st.write("**Impact de la différence mensuelle**")
+            diff_moy = df["Différence Mensuelle (€)"].mean()
+            if diff_moy > 0:
+                st.info(
+                    f"💰 Économie moyenne : {diff_moy:,.0f} €/mois avec la location"
+                )
+            else:
+                st.info(
+                    f"💸 Surcoût moyen : {abs(diff_moy):,.0f} €/mois avec la location"
+                )
