@@ -194,8 +194,9 @@ def achat_vs_location_render():
 
         for annee in range(1, duree_projection + 1):
             # === SCENARIO ACHETEUR ===
-            # Valeur du bien qui augmente
-            valeur_bien *= 1 + croissance_immo
+            # Valeur du bien qui augmente (à partir de la 2ème année)
+            if annee > 1:
+                valeur_bien *= 1 + croissance_immo
 
             # Mensualité du crédit (0 si prêt fini)
             mensualite_annuelle = mensualite_credit * 12 if annee <= duree_credit else 0
@@ -393,6 +394,7 @@ def achat_vs_location_render():
                     }
                 ),
                 use_container_width=True,
+                hide_index=True,
             )
 
         # Informations et interprétation
